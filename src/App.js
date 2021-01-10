@@ -22,9 +22,11 @@ const App = () => {
     const user = AuthService.getCurrentUser();
 
     if (user) {
+      console.log(user);
       setCurrentUser(user);
-      setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
-      setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
+      // here we can let the backend and database decide upon the roles of the user
+      // setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
+      // setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
     }
   }, []);
 
