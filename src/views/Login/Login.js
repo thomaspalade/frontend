@@ -1,13 +1,4 @@
 import React from 'react';
-import InputLabel from "@material-ui/core/InputLabel";
-import OutlinedInput from "@material-ui/core/OutlinedInput";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import IconButton from "@material-ui/core/IconButton";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import Icon from '@material-ui/core/Icon';
 import axios from 'axios';
 import Alert from '@material-ui/lab/Alert';
 
@@ -55,14 +46,10 @@ class Login extends React.Component {
 
     handleSubmit = () => {
         /// chestii de facut cand se apasa submit pe butonu de CREATE ACCOUNT
-        console.log('onClick');
         axios.post('http://localhost:8090/login',{
             "userName" : this.state.username,
             "passwd"   : this.state.password
         }).then(res => {
-            console.log(res);
-            console.log(res.data);
-            console.log(this.props);
             this.props.login_logout();
             setTimeout(() => {
                 this.props.set_token(res.data.token, this.state.username, this.props);

@@ -12,15 +12,15 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import {useEffect, useState } from "react";
+import { useState } from "react";
 import axios from 'axios';
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+      <Link color="inherit" href="http://localhost:8081/admin/dashboard/">
+      Thomas Palade
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -62,20 +62,11 @@ export default function SignUp() {
         'Email': mail,
         'Password': password,
     }
-    console.log(frmdetails);
   }
 
   const handleSubmit = () => {
     /// chestii de facut cand se apasa submit pe butonu de CREATE ACCOUNT
     /// send it to back-end/andor - mongodb
-
-    console.log("here 1");
-    console.log({
-      "firstName": fName,
-      "lastName": lName,
-      "username": mail,
-      "password": password
-    });
 
     axios.post("http://localhost:4000/users/register",{
             "firstName": fName,

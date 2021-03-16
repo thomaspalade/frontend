@@ -128,14 +128,14 @@ export default function Notifications() {
           Handcrafted by our friends from{" "}
           <a
             target="_blank"
-            href="https://material-ui-next.com/?ref=creativetime"
+            href="http://localhost:8081/admin/dashboard"
           >
             Material UI
           </a>{" "}
           and styled by{" "}
           <a
             target="_blank"
-            href="https://www.creative-tim.com/?ref=mdr-notifications-page"
+            href="http://localhost:8081/admin/dashboard"
           >
             Creative Tim
           </a>
@@ -242,22 +242,27 @@ export default function Notifications() {
                 />
               </GridItem>
               <GridItem xs={12} sm={12} md={4}>
+                
                 <Button
                   fullWidth
-                  color="primary"
+                  color="danger"
                   onClick={() => showNotification("tc")}
                 >
+
                   Top Center
+
                 </Button>
+
                 <Snackbar
                   place="tc"
                   color="info"
                   icon={AddAlert}
-                  message="Welcome to MATERIAL DASHBOARD React - a beautiful freebie for every web developer."
+                  message="TOMIIII to MATERIAL DASHBOARD React - a beautiful freebie for every web developer."
                   open={tc}
                   closeNotification={() => setTC(false)}
                   close
                 />
+
               </GridItem>
               <GridItem xs={12} sm={12} md={4}>
                 <Button

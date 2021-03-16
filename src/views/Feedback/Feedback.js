@@ -8,7 +8,6 @@ import CardBody from "components/Card/CardBody.js";
 import Typography from '@material-ui/core/Typography';
 import InputLabel from "@material-ui/core/InputLabel";
 import TextField from '@material-ui/core/TextField';
-import CardFooter from "components/Card/CardFooter.js";
 import Button from "components/CustomButtons/Button.js";
 import axios from 'axios';
 import GridItem from "components/Grid/GridItem.js";
@@ -16,8 +15,11 @@ import GridContainer from "components/Grid/GridContainer.js";
 import Table from "components/Table/Table.js";
 import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
-import Grid from '@material-ui/core/Grid';
 import moment from 'moment'
+import CommentIcon from '@material-ui/icons/Comment';
+import Rating from '@material-ui/lab/Rating';
+import AddAlert from "@material-ui/icons/AddAlert";
+import Snackbar from "components/Snackbar/Snackbar.js";
 
 const styles = {
   typo: {
@@ -58,26 +60,60 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
+const useStyles1 = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    '& > * + *': {
+      marginTop: theme.spacing(1),
+    },
+    fontSize: "40px"
+  },
+}));
+
+
 export default function FeedbackPage(props) {
   const classes = useStyles();
+  const classes1 = useStyles1();
   const [text, setText] = useState("");
   const [feedbacks, setFeedbacks] = useState([]);
+  const [visibleFeedbacks, setVisibleFeedbacks] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [succesAlert, setSuccesAlert] = useState(false);
+  const [errorAlert, setErrorAlert] = useState(false);
 
   const onChangeText = (e) => {
     const text = e.target.value;
     setText(text);
   };
 
+  const showNotification = place => {
+    switch (place) {
+      case "succesAlert":
+        if (!succesAlert) {
+          setSuccesAlert(true);
+          setTimeout(function() {
+            setSuccesAlert(false);
+          }, 4000);
+        }
+        break;
+      case "errorAlert":
+        if (!errorAlert) {
+          setErrorAlert(true);
+          setTimeout(function() {
+            setErrorAlert(false);
+          }, 4000);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   const getAllUserExistingFeedbacks = () => {
     UserService.getCurrentUser1().then(
       (response) => {
-        console.log(response);
-        // HERE FOARTE IMPORTANT
-        // daca s-a intors aici cu response ok atunci s-a autentificat bine si pot face orice actiune
-        // adica token-ul e bine bine
-        console.log(JSON.stringify(response.data.id));
         axios.get("http://localhost:5000/feedbacks/" + response.data.id).then(res => {
-          console.log(res);
           console.log(JSON.stringify(res.data));
           setFeedbacks(res.data);
           // s-a intors un raspuns bun
@@ -117,14 +153,36 @@ export default function FeedbackPage(props) {
           userId: response.data.id,
           text: text
         }).then(res => {
+          showNotification("succesAlert");
           console.log(res);
           console.log(JSON.stringify(res.data));
           setText(res.data.text);
           window.location.reload(false);
-
           // s-a intors un raspuns bun
-          })}).catch((error) => {
+          }).catch((error) => {
             // Error
+            showNotification("errorAlert");
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              // console.log(error.response.data);
+              console.log(error.response.status);
+              if (error.response.status === 400) {
+                // username-ul este deja utilizat de altcineva, incearca cu altul
+              }
+              console.log(error.response.headers);
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+            }
+            console.log(error.config);
+            console.log(error);
+          });
+
+          }).catch((error) => {
+            // Error
+            console.log("here babyyyyyy");
             if (error.response) {
               // The request was made and the server responded with a status code
               // that falls out of the range of 2xx
@@ -147,9 +205,10 @@ export default function FeedbackPage(props) {
   return (
     <div>
       <div style={{textAlign: 'center'}}>
-      <Typography variant="h2" style={{textAlign: 'center', marginBottom: '15px', marginTop: '-15px'}}>
+      <Typography variant="h2" style={{textAlign: 'center', marginBottom: '15px', marginTop: '-40px'}}>
           Feedback
       </Typography>
+      <CommentIcon style={{marginTop: -10, fontSize: 50}}/>
       </div>
 
     <Card>
@@ -160,7 +219,9 @@ export default function FeedbackPage(props) {
         </p>
       </CardHeader>
       <CardBody>
-        <InputLabel style={{ color: "#AAAAAA" }}>Complete the text message from above</InputLabel>
+        <InputLabel style={{ color: "#AAAAAA", marginBottom: '15px', marginTop: '10px' }}>Complete the text message from above</InputLabel>
+        <div className={classes1.root}>
+        </div>
           {
           // this is the textbox for firstname adress
           <TextField
@@ -184,25 +245,22 @@ export default function FeedbackPage(props) {
             // validations={[required]}
           />
         }
+
+        <Button style={{marginTop: '20px'}} color="primary" onClick={handleSendFeedback}>Send Feedback</Button>
       </CardBody>
-    </Card>
-    <Card>
-    <CardFooter>
-      <Button color="primary" onClick={handleSendFeedback}>Send Feedback</Button>
-    </CardFooter>
     </Card>
 
     <GridContainer>
       <GridItem xs={12} sm={12} md={12}>
         <Card>
-          <CardHeader color="primary">
+          <CardHeader color="primary" onClick={() => setVisibleFeedbacks(!visibleFeedbacks)}>
             <h3 className={classes.cardTitleWhite}>Here are your previous feedback messages</h3>
             <p className={classes.cardCategoryWhite}>
               Check this to be sure you don't write the same feedback content twice.
             </p>
           </CardHeader>
           <CardBody>
-            {true && <Table
+            {visibleFeedbacks && <Table
               tableHeaderColor="primary"
               tableHead={["Date", "Message", "Customer Rating", "Answered", "Solved"]}
               tableData={
@@ -214,6 +272,20 @@ export default function FeedbackPage(props) {
         </Card>
       </GridItem>
     </GridContainer>
+
+    {
+      // here we add the data for alerts
+      <Snackbar
+        place="tc"
+        color={succesAlert ? "success" : "danger"}
+        icon={AddAlert}
+        message={succesAlert ? "Thank you! Your message has been successfully sent. We will contact you very soon!" : 
+          "We are very sory but something went wrong with your request. Please try again!"}
+        open={succesAlert || errorAlert}
+        closeNotification={() => setSuccesAlert(false) && setErrorAlert(false)}
+        close
+      />
+    }
 
     </div>
   );

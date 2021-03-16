@@ -50,16 +50,6 @@ const sidebarStyle = theme => ({
       ...transition
     }
   },
-  drawerPaperRTL: {
-    [theme.breakpoints.up("md")]: {
-      left: "auto !important",
-      right: "0 !important"
-    },
-    [theme.breakpoints.down("sm")]: {
-      left: "0  !important",
-      right: "auto !important"
-    }
-  },
   logo: {
     position: "relative",
     padding: "15px 15px",
@@ -88,17 +78,17 @@ const sidebarStyle = theme => ({
     backgroundColor: "transparent",
     "&,&:hover": {
       color: whiteColor
-    }
-  },
-  logoLinkRTL: {
-    textAlign: "right"
+    },
+    marginBottom: "10px",
+    marginTop: "8px"
   },
   logoImage: {
-    width: "30px",
+    width: "60px",
     display: "inline-block",
-    maxHeight: "30px",
+    maxHeight: "20px",
     marginLeft: "10px",
-    marginRight: "15px"
+    marginRight: "15px",
+    marginTop: "-10px"
   },
   img: {
     width: "35px",
@@ -167,20 +157,12 @@ const sidebarStyle = theme => ({
     verticalAlign: "middle",
     color: "rgba(" + hexToRgb(whiteColor) + ", 0.8)"
   },
-  itemIconRTL: {
-    marginRight: "3px",
-    marginLeft: "15px",
-    float: "right"
-  },
   itemText: {
     ...defaultFont,
     margin: "0",
     lineHeight: "30px",
     fontSize: "14px",
     color: whiteColor
-  },
-  itemTextRTL: {
-    textAlign: "right"
   },
   whiteFont: {
     color: whiteColor

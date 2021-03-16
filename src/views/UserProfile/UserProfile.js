@@ -5,18 +5,18 @@ import InputLabel from "@material-ui/core/InputLabel";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
-import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
-import CardAvatar from "components/Card/CardAvatar.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import axios from 'axios';
-import avatar from "assets/img/faces/marc.jpg";
 import ContentEditable from "react-contenteditable";
+import Avatar from "@material-ui/core/Avatar";
+import AddAlert from "@material-ui/icons/AddAlert";
+import Snackbar from "components/Snackbar/Snackbar.js";
 
 import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
@@ -56,6 +56,10 @@ export default function UserProfile() {
   const [postalCode, setPostalCode] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
+  const [publicCode, setPublicCode] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [succesAlert, setSuccesAlert] = useState(false);
+  const [errorAlert, setErrorAlert] = useState(false);
 
   const onChangeUsername = (e) => {
     const username = e.target.value;
@@ -102,19 +106,35 @@ export default function UserProfile() {
     setAddress(address);
   };
 
+  const showNotification = place => {
+    switch (place) {
+      case "succesAlert":
+        if (!succesAlert) {
+          setSuccesAlert(true);
+          setTimeout(function() {
+            setSuccesAlert(false);
+          }, 4000);
+        }
+        break;
+      case "errorAlert":
+        if (!errorAlert) {
+          setErrorAlert(true);
+          setTimeout(function() {
+            setErrorAlert(false);
+          }, 4000);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   const getUserProfileData = () => {
-    console.log('trying to get user data');
-    
     UserService.getCurrentUser1().then(
       (response) => {
-        console.log(response);
-        // HERE FOARTE IMPORTANT
         // daca s-a intors aici cu response ok atunci s-a autentificat bine si pot face orice actiune
         // adica token-ul e bine bine
-        console.log(JSON.stringify(response.data.id));
         axios.get("http://localhost:5000/profile/" + response.data.id).then(res => {
-          console.log(res);
-          console.log(JSON.stringify(res.data));
           setFirstName(res.data.firstName);
           setLastName(res.data.lastName);
           setEmail(res.data.email);
@@ -124,6 +144,7 @@ export default function UserProfile() {
           setCountry(res.data.country);
           setPostalCode(res.data.postalCode);
           setDescription(res.data.description);
+          setPublicCode(res.data.publicCode);
           // s-a intors un raspuns bun
           })}).catch((error) => {
             // Error
@@ -172,32 +193,55 @@ export default function UserProfile() {
           postalCode: postalCode,
           description: description
         }).then(res => {
+          // showNotification("succesAlert");
           console.log(res);
           console.log(JSON.stringify(res.data));
-          window.location.reload(false); 
+          window.location.reload(false);
+
           setFirstName(res.data.firstName);
           setLastName(res.data.lastName);
           // window.location.reload(false); 
           // s-a intors un raspuns bun
-          })}).catch((error) => {
-            // Error
-            if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
-              // console.log(error.response.data);
-              console.log(error.response.status);
-              if (error.response.status === 400) {
-                // username-ul este deja utilizat de altcineva, incearca cu altul
-              }
-              console.log(error.response.headers);
-            } else if (error.request) {
-              console.log(error.request);
-            } else {
-              // Something happened in setting up the request that triggered an Error
+        }).catch((error) => {
+          // Error
+          showNotification("errorAlert");
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            // console.log(error.response.data);
+            console.log(error.response.status);
+            if (error.response.status === 400) {
+              // username-ul este deja utilizat de altcineva, incearca cu altul
             }
-            console.log(error.config);
-            console.log(error);
-          });
+            console.log(error.response.headers);
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+          }
+          console.log(error.config);
+          console.log(error);
+        });
+
+        }).catch((error) => {
+          // Error
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            // console.log(error.response.data);
+            console.log(error.response.status);
+            if (error.response.status === 400) {
+              // username-ul este deja utilizat de altcineva, incearca cu altul
+            }
+            console.log(error.response.headers);
+          } else if (error.request) {
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+          }
+          console.log(error.config);
+          console.log(error);
+        });
   };
 
   return (
@@ -253,7 +297,7 @@ export default function UserProfile() {
                     label="Username"
                     // name="username"
                     autoComplete="username"
-                    autoFocus
+                    // autoFocus
                     // onChange={e => setMail(e.target.value)}
                     type="text"
                     // className="form-control"
@@ -277,7 +321,7 @@ export default function UserProfile() {
                     label="Email Address"
                     // name="email"
                     autoComplete="email"
-                    autoFocus
+                    // autoFocus
                     // onChange={e => setMail(e.target.value)}
                     type="text"
                     // className="form-control"
@@ -303,7 +347,7 @@ export default function UserProfile() {
                     label="First Name"
                     // name="firstName"
                     autoComplete="firstName"
-                    autoFocus
+                    // autoFocus
                     // onChange={e => setMail(e.target.value)}
                     type="text"
                     // className="form-control"
@@ -327,7 +371,7 @@ export default function UserProfile() {
                     label="Last Name"
                     // name="lastName"
                     autoComplete="lastName"
-                    autoFocus
+                    // autoFocus
                     // onChange={e => setMail(e.target.value)}
                     type="text"
                     // className="form-control"
@@ -353,7 +397,7 @@ export default function UserProfile() {
                     label="City"
                     // name="city"
                     autoComplete="city"
-                    autoFocus
+                    // autoFocus
                     // onChange={e => setMail(e.target.value)}
                     type="text"
                     // className="form-control"
@@ -377,7 +421,7 @@ export default function UserProfile() {
                     label="Country"
                     // name="country"
                     autoComplete="country"
-                    autoFocus
+                    // autoFocus
                     // onChange={e => setMail(e.target.value)}
                     type="text"
                     // className="form-control"
@@ -401,7 +445,7 @@ export default function UserProfile() {
                     label="Postal Code"
                     // name="postalCode"
                     autoComplete="postalCode"
-                    autoFocus
+                    // autoFocus
                     // onChange={e => setMail(e.target.value)}
                     type="text"
                     // className="form-control"
@@ -432,17 +476,17 @@ export default function UserProfile() {
 
                   <InputLabel style={{ color: "#AAAAAA" }}>About me</InputLabel>
                   {
-                  // this is the textbox for firstname adress
+                    <div>
                   <TextField
                     variant="outlined"
                     margin="normal"
                     // required
                     fullWidth
-                    id="postalCode"
+                    id="description"
                     label="Description"
                     // name="description"
                     autoComplete="description"
-                    autoFocus
+                    // autoFocus
                     // onChange={e => setMail(e.target.value)}
                     type="text"
                     // className="form-control"
@@ -453,6 +497,29 @@ export default function UserProfile() {
                     multiline
                     // validations={[required]}
                   />
+                  
+                  {visible && <TextField
+                    variant="outlined"
+                    margin="normal"
+                    // required
+                    fullWidth
+                    id="publicCode"
+                    label="Public Code"
+                    // name="publicCode"
+                    autoComplete="publicCode"
+                    // autoFocus
+                    // onChange={e => setMail(e.target.value)}
+                    type="text"
+                    // className="form-control"
+                    name="publicCode"
+                    value={publicCode || ''}
+                    // value="Thomas"
+                    onChange={"onChangepublicCode"}
+                    multiline
+                    // validations={[required]}
+                  />
+                  }
+                  </div>
                 }
                 </GridItem>
               </GridContainer>
@@ -462,28 +529,45 @@ export default function UserProfile() {
             </CardFooter>
           </Card>
         </GridItem>
+
+
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
-            <CardAvatar profile>
-              <a href="#pablo" onClick={e => e.preventDefault()}>
-                <img src={avatar} alt="..." />
-              </a>
-            </CardAvatar>
+            <Avatar aria-label="recipe" style={{backgroundColor: '#9c27b0',
+              width: "80px", height: "80px", fontSize: "40px", margin: "auto", marginTop: "20px", padding: "20px"}}>
+              {`${firstName[0] + lastName[0]}`}
+            </Avatar>
             <CardBody profile>
-              <h6 className={classes.cardCategory}>CEO / CO-FOUNDER</h6>
-              <h4 className={classes.cardTitle}>Alec Thompson</h4>
+              <h6 className={classes.cardCategory}>NORMAL USER</h6>
+              {company ? <h5 className={classes.cardCategory}>{`${company}`}</h5> : null}
+              <h4 className={classes.cardTitle}>{`${firstName + ' ' + lastName}`}</h4>
               <p className={classes.description}>
-                Don{"'"}t be scared of the truth because we need to restart the
-                human foundation in truth And I love you like Kanye loves Kanye
-                I love Rick Owens’ bed design but the back is...
+              {`${description || ''}`}
               </p>
-              <Button color="primary" round>
-                Follow
+              <Button color="primary" round onClick={(e) => setVisible(!visible)}>
+                {!visible ? "Get Public Code" : "Hide Public Code" }
               </Button>
             </CardBody>
           </Card>
         </GridItem>
+
       </GridContainer>
+
+      {
+        // here we add the data for alerts
+        <Snackbar
+          place="tc"
+          color={succesAlert ? "success" : "danger"}
+          icon={AddAlert}
+          message={succesAlert ? "Thank you! Your message has been successfully sent. We will contact you very soon!" : 
+            "We are very sory but something went wrong with your request. Please try again!"}
+          open={succesAlert || errorAlert}
+          closeNotification={() => setSuccesAlert(false) && setErrorAlert(false)}
+          close
+        />
+      }
+
+
     </div>
     </div>
   );

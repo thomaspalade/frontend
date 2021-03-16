@@ -17,6 +17,10 @@ const tasksStyle = {
     position: "relative",
     borderBottom: "1px solid " + grayColor[5]
   },
+  headerRow: {
+    position: "relative",
+    borderBottom: "3px solid " + grayColor[10]
+  },
   tableActions: {
     display: "flex",
     border: "none",
@@ -31,8 +35,14 @@ const tasksStyle = {
     lineHeight: "1.42857143",
     fontSize: "14px"
   },
-  tableCellRTL: {
-    textAlign: "right"
+  tableCell2: {
+    ...defaultFont,
+    padding: "8px",
+    verticalAlign: "middle",
+    border: "none",
+    lineHeight: "1.42857143",
+    fontSize: "15px",
+    color: "#932aad"
   },
   tableActionButton: {
     width: "27px",

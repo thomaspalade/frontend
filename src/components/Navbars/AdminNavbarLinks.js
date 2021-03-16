@@ -18,6 +18,7 @@ import Search from "@material-ui/icons/Search";
 // core components
 import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
+import { useHistory } from "react-router-dom";
 
 import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 
@@ -29,6 +30,7 @@ export default function AdminNavbarLinks(props) {
   const classes = useStyles();
   const [openNotification, setOpenNotification] = React.useState(null);
   const [openProfile, setOpenProfile] = React.useState(null);
+  let history = useHistory();
   const handleClickNotification = event => {
     if (openNotification && openNotification.contains(event.target)) {
       setOpenNotification(null);
@@ -49,6 +51,26 @@ export default function AdminNavbarLinks(props) {
   const handleCloseProfile = () => {
     setOpenProfile(null);
   };
+  const handleRedirectProfile = () => {
+    setOpenProfile(null);
+    history.push("/admin/" + "user");
+  };
+  const handleRedirectMyDocuments = () => {
+    setOpenProfile(null);
+    history.push("/admin/" + "album");
+  };
+  const handleRedirectPublicCode = () => {
+    setOpenProfile(null);
+    history.push("/admin/" + "publiccodes");
+  };
+  const handleRedirectFeedback = () => {
+    setOpenProfile(null);
+    history.push("/admin/" + "feedback");
+  };
+  const handleRedirectLogin = () => {
+    setOpenProfile(null);
+    history.push("/admin/" + "login");
+  };
   const handleLogout = () => {
     setOpenProfile(null);
     AuthService.logout();
@@ -56,6 +78,10 @@ export default function AdminNavbarLinks(props) {
     // props.history.push("/");
     window.location.reload(false);
   };
+
+  const handleSearch = () => {
+    console.log("here");
+  }
 
   return (
     <div>
@@ -71,99 +97,9 @@ export default function AdminNavbarLinks(props) {
             }
           }}
         />
-        <Button color="white" aria-label="edit" justIcon round>
+        <Button color="white" aria-label="edit" justIcon round onClick={handleSearch}>
           <Search />
         </Button>
-      </div>
-      <Button
-        color={window.innerWidth > 959 ? "transparent" : "white"}
-        justIcon={window.innerWidth > 959}
-        simple={!(window.innerWidth > 959)}
-        aria-label="Dashboard"
-        className={classes.buttonLink}
-      >
-        <Dashboard className={classes.icons} />
-        <Hidden mdUp implementation="css">
-          <p className={classes.linkText}>Dashboard</p>
-        </Hidden>
-      </Button>
-      <div className={classes.manager}>
-        <Button
-          color={window.innerWidth > 959 ? "transparent" : "white"}
-          justIcon={window.innerWidth > 959}
-          simple={!(window.innerWidth > 959)}
-          aria-owns={openNotification ? "notification-menu-list-grow" : null}
-          aria-haspopup="true"
-          onClick={handleClickNotification}
-          className={classes.buttonLink}
-        >
-          <Notifications className={classes.icons} />
-          <span className={classes.notifications}>5</span>
-          <Hidden mdUp implementation="css">
-            <p onClick={handleCloseNotification} className={classes.linkText}>
-              Notification
-            </p>
-          </Hidden>
-        </Button>
-        <Poppers
-          open={Boolean(openNotification)}
-          anchorEl={openNotification}
-          transition
-          disablePortal
-          className={
-            classNames({ [classes.popperClose]: !openNotification }) +
-            " " +
-            classes.popperNav
-          }
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              id="notification-menu-list-grow"
-              style={{
-                transformOrigin:
-                  placement === "bottom" ? "center top" : "center bottom"
-              }}
-            >
-              <Paper>
-                <ClickAwayListener onClickAway={handleCloseNotification}>
-                  <MenuList role="menu">
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Mike John responded to your email
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      You have 5 new tasks
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      You{"'"}re now friend with Andrew
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another Notification
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another One
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Poppers>
       </div>
       <div className={classes.manager}>
         <Button
@@ -204,16 +140,34 @@ export default function AdminNavbarLinks(props) {
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
                     <MenuItem
-                      onClick={handleCloseProfile}
+                      onClick={handleRedirectProfile}
                       className={classes.dropdownItem}
                     >
                       Profile
                     </MenuItem>
                     <MenuItem
-                      onClick={handleCloseProfile}
+                      onClick={handleRedirectMyDocuments}
                       className={classes.dropdownItem}
                     >
-                      Settings
+                      My Documents
+                    </MenuItem>
+                    <MenuItem
+                      onClick={handleRedirectPublicCode}
+                      className={classes.dropdownItem}
+                    >
+                      My Public Code
+                    </MenuItem>
+                    <MenuItem
+                      onClick={handleRedirectLogin}
+                      className={classes.dropdownItem}
+                    >
+                      Login
+                    </MenuItem>
+                    <MenuItem
+                      onClick={handleRedirectFeedback}
+                      className={classes.dropdownItem}
+                    >
+                      Give Feedback
                     </MenuItem>
                     <Divider light />
                     <MenuItem

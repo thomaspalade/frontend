@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import {useEffect, useState } from "react";
+import { useState } from "react";
 import axios from 'axios';
 
 let globalToken = true;
@@ -21,8 +21,8 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+      <Link color="inherit" href="http://localhost:8081/admin/dashboard/">
+      Thomas-Emanuel Palade
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}

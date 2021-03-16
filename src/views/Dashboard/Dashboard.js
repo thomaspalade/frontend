@@ -13,9 +13,10 @@ import Update from "@material-ui/icons/Update";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import AccessTime from "@material-ui/icons/AccessTime";
 import Accessibility from "@material-ui/icons/Accessibility";
-import BugReport from "@material-ui/icons/BugReport";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
+import ErrorIcon from '@material-ui/icons/Error';
+import DescriptionIcon from '@material-ui/icons/Description';
+import AddAlert from "@material-ui/icons/AddAlert";
+import Snackbar from "components/Snackbar/Snackbar.js";
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
@@ -28,9 +29,11 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
-import Button from '@material-ui/core/Button';
+import Button from "components/CustomButtons/Button.js";
+import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import axios from 'axios';
 import { bugs, website, server } from "variables/general.js";
+import { useHistory } from "react-router-dom";
 
 import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
@@ -49,18 +52,15 @@ export default function Dashboard(props) {
   const classes = useStyles();
   const [currentUser, setCurrentUser] = useState(undefined);
   const [username, setUsername] = useState("");
-
-  useEffect(() => {
-    const user = AuthService.getCurrentUser();
-
-    if (user) {
-      console.log(user);
-      setCurrentUser(user);
-      // here we can let the backend and database decide upon the roles of the user
-      // setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
-      // setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
-    }
-  }, []);
+  const [pendingDocuments, setPendingDocuments] = useState([]);
+  const [rejectedDocuments, setRejectedDocuments] = useState([]);
+  const [requestedDocuments, setRequestedDocuments] = useState([]);
+  const [requestedDocumentsData, setRequestedDocumentsData] = useState([]);
+  const [pendingDocumentsData, setPendingDocumentsData] = useState([]);
+  const [rejectedDocumentsData, setRejectedDocumentsData] = useState([]);
+  const [succesAlert, setSuccesAlert] = useState(false);
+  const [errorAlert, setErrorAlert] = useState(false);
+  let history = useHistory();
 
   const logOut = () => {
     AuthService.logout();
@@ -68,22 +68,158 @@ export default function Dashboard(props) {
     props.history.push("/");
     window.location.reload(false);
     setUsername("mihaita");
-    console.log(username);
   };
 
+  const showNotification = place => {
+    switch (place) {
+      case "succesAlert":
+        if (!succesAlert) {
+          setSuccesAlert(true);
+          setTimeout(function() {
+            setSuccesAlert(false);
+          }, 4000);
+        }
+        break;
+      case "errorAlert":
+        if (!errorAlert) {
+          setErrorAlert(true);
+          setTimeout(function() {
+            setErrorAlert(false);
+          }, 4000);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleClickOnPending = (e) => {
+    history.push("/admin/" + "pending");
+  };
+
+  const handleClickOnRejected = (e) => {
+    history.push("/admin/" + "rejected");
+  };
+
+  const handleClickOnRequested = (e) => {
+    history.push("/admin/" + "album");
+  };
+
+  const handleSendMessage = (e) => {
+    axios.post("http://localhost:5000/messages/", {
+      text: "mihaita"
+    }).then(res => {
+      showNotification("succesAlert");
+      console.log(JSON.stringify(res.data));
+      // setText(res.data.text);
+      window.location.reload(false);
+      // s-a intors un raspuns bun
+      }).catch((error) => {
+        showNotification("errorAlert");
+        // Error
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          // console.log(error.response.data);
+          console.log(error.response.status);
+          if (error.response.status === 400) {
+            // username-ul este deja utilizat de altcineva, incearca cu altul
+          }
+          console.log(error.response.headers);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+        }
+        console.log(error.config);
+        console.log(error);
+      });
+  };
+
+  const getAllUserExistingFeedbacks = () => {
+    UserService.getCurrentUser1().then(
+      (response) => {
+        axios.get("http://localhost:5000/profile/" + response.data.id).then(res => {
+          console.log(JSON.stringify(res.data));
+          // setFeedbacks(res.data);
+          setPendingDocuments(res.data.pendingDocumentsIds);
+          setRejectedDocuments(res.data.rejectedDocumentsIds);
+          setRequestedDocuments(res.data.requestedDocumentsIds);
+          console.log(JSON.stringify(pendingDocuments), JSON.stringify(rejectedDocuments), JSON.stringify(requestedDocuments));
+
+          if (res.data.requestedDocumentsIds !== [] || res.data.rejectedDocumentsIds || res.data.pendingDocumentsIds) {
+
+            // add here support for pending and rejected documents tooo !!!
+
+            console.log("here tomi")
+            axios.post("http://localhost:5000/documents/getDocumentsByIds", {
+            requestedDocumentsIds: res.data.requestedDocumentsIds,
+            rejectedDocumentsIds: res.data.rejectedDocumentsIds,
+            pendingDocumentsIds: res.data.pendingDocumentsIds,
+          }).then(res => {
+            console.log(JSON.stringify(res.data));
+            console.log("here tomi 2");
+            setRequestedDocumentsData(res.data.requestedDocuments);
+            setPendingDocumentsData(res.data.pendingDocuments);
+            setRejectedDocumentsData(res.data.rejectedDocuments);
+            const newdata = res.data.requestedDocuments.map((e, index) => [index, e.heading, e.description, e.extension]);
+            console.log(JSON.stringify(newdata));
+            // window.location.reload(false); 
+            // s-a intors un raspuns bun
+            }).catch((error) => {
+              // Error
+              if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                // console.log(error.response.data);
+                console.log(error.response.status);
+                if (error.response.status === 400) {
+                  // username-ul este deja utilizat de altcineva, incearca cu altul
+                }
+                console.log(error.response.headers);
+              } else if (error.request) {
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+              }
+              console.log(error.config);
+              console.log(error);
+            });
+          }
+
+          // s-a intors un raspuns bun
+          })}).catch((error) => {
+            // Error
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              // console.log(error.response.data);
+              console.log(error.response.status);
+              if (error.response.status === 400) {
+                // username-ul este deja utilizat de altcineva, incearca cu altul
+              }
+              console.log(error.response.headers);
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+            }
+            console.log(error.config);
+            console.log(error);
+          });
+  };
+
+  
+  useEffect(() => 
+    getAllUserExistingFeedbacks(), []
+  );
+  
+
   const handleAuthAction = () => {
-    console.log("here 5");
     UserService.getCurrentUser1().then(
       (response) => {
         console.log(response);
-
-        // HERE FOARTE IMPORTANT
-
-        // daca s-a intors aici cu response ok atunci s-a autentificat bine si pot face orice actiune
-        // adica token-ul e bine bine
-
         axios.get("http://localhost:5000/profiles").then(res => {
-              console.log(res);
               console.log(JSON.stringify(res.data));
               // s-a intors un raspuns bun
             })}).catch((error) => {
@@ -106,31 +242,30 @@ export default function Dashboard(props) {
               console.log(error);
             });
           };
-
-  // <h1> Sunt logat cu urmatoarele date: {`${JSON.stringify(currentUser)}`}</h1>
-
+    //<h1> Sunt logat cu urmatoarele date: {`${currentUser && currentUser.lastName}`}</h1>
   return (
     <div>
-      <h1> Sunt logat cu urmatoarele date: {`${currentUser && currentUser.lastName}`}</h1>
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
             <CardHeader color="warning" stats icon>
               <CardIcon color="warning">
-                <Icon>content_copy</Icon>
+                <DescriptionIcon />
               </CardIcon>
-              <p className={classes.cardCategory}>Used Space</p>
+              <p className={classes.cardCategory}>Request A Document</p>
+              <a href={"http://localhost:8081/admin/request"}>
               <h3 className={classes.cardTitle}>
-                49/50 <small>GB</small>
+                Request here
               </h3>
+              </a>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
                 <Danger>
-                  <Warning />
+                  <DescriptionIcon />
                 </Danger>
-                <a href="#pablo" onClick={e => e.preventDefault()}>
-                  Get more space
+                <a href={"http://localhost:8081/admin/request"}>
+                  Click here
                 </a>
               </div>
             </CardFooter>
@@ -140,15 +275,19 @@ export default function Dashboard(props) {
           <Card>
             <CardHeader color="success" stats icon>
               <CardIcon color="success">
-                <Store />
+              <FormatListNumberedIcon/>
               </CardIcon>
-              <p className={classes.cardCategory}>Revenue</p>
-              <h3 className={classes.cardTitle}>$34,245</h3>
+              <p className={classes.cardCategory}>Public codes</p>
+              <a href={"http://localhost:8081/admin/publiccodes"}>
+              <h3 className={classes.cardTitle}>Get codes here</h3>
+              </a>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
                 <DateRange />
-                Last 24 Hours
+                <a href={"http://localhost:8081/admin/publiccodes"}>
+                  Click here
+                </a>
               </div>
             </CardFooter>
           </Card>
@@ -159,13 +298,17 @@ export default function Dashboard(props) {
               <CardIcon color="danger">
                 <Icon>info_outline</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Fixed Issues</p>
-              <h3 className={classes.cardTitle}>75</h3>
+              <p className={classes.cardCategory}>Check your docs</p>
+              <a href={"http://localhost:8081/admin/album"}>
+              <h3 className={classes.cardTitle}>All documents</h3>
+              </a>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
                 <LocalOffer />
-                Tracked from Github
+                <a href={"http://localhost:8081/admin/album"}>
+                  Click here
+                </a>
               </div>
             </CardFooter>
           </Card>
@@ -176,87 +319,17 @@ export default function Dashboard(props) {
               <CardIcon color="info">
                 <Accessibility />
               </CardIcon>
-              <p className={classes.cardCategory}>Followers</p>
-              <h3 className={classes.cardTitle}>+245</h3>
+              <p className={classes.cardCategory}>View Profile</p>
+              <a href={"http://localhost:8081/admin/user"}>
+              <h3 className={classes.cardTitle}>Check profile</h3>
+              </a>
             </CardHeader>
             <CardFooter stats>
               <div className={classes.stats}>
                 <Update />
-                Just Updated
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-      </GridContainer>
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={4}>
-          <Card chart>
-            <CardHeader color="success">
-              <ChartistGraph
-                className="ct-chart"
-                data={dailySalesChart.data}
-                type="Line"
-                options={dailySalesChart.options}
-                listener={dailySalesChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-              <h4 className={classes.cardTitle}>Daily Sales</h4>
-              <p className={classes.cardCategory}>
-                <span className={classes.successText}>
-                  <ArrowUpward className={classes.upArrowCardCategory} /> 55%
-                </span>{" "}
-                increase in today sales.
-              </p>
-            </CardBody>
-            <CardFooter chart>
-              <div className={classes.stats}>
-                <AccessTime /> updated 4 minutes ago
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={4}>
-          <Card chart>
-            <CardHeader color="warning">
-              <ChartistGraph
-                className="ct-chart"
-                data={emailsSubscriptionChart.data}
-                type="Bar"
-                options={emailsSubscriptionChart.options}
-                responsiveOptions={emailsSubscriptionChart.responsiveOptions}
-                listener={emailsSubscriptionChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-              <h4 className={classes.cardTitle}>Email Subscriptions</h4>
-              <p className={classes.cardCategory}>Last Campaign Performance</p>
-            </CardBody>
-            <CardFooter chart>
-              <div className={classes.stats}>
-                <AccessTime /> campaign sent 2 days ago
-              </div>
-            </CardFooter>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={4}>
-          <Card chart>
-            <CardHeader color="danger">
-              <ChartistGraph
-                className="ct-chart"
-                data={completedTasksChart.data}
-                type="Line"
-                options={completedTasksChart.options}
-                listener={completedTasksChart.animation}
-              />
-            </CardHeader>
-            <CardBody>
-              <h4 className={classes.cardTitle}>Completed Tasks</h4>
-              <p className={classes.cardCategory}>Last Campaign Performance</p>
-            </CardBody>
-            <CardFooter chart>
-              <div className={classes.stats}>
-                <AccessTime /> campaign sent 2 days ago
+                <a href={"http://localhost:8081/admin/user"}>
+                  Click here
+                </a>
               </div>
             </CardFooter>
           </Card>
@@ -264,69 +337,92 @@ export default function Dashboard(props) {
       </GridContainer>
       <GridContainer>
         <GridItem xs={12} sm={12} md={6}>
+          <div onClick={handleClickOnPending}>
           <CustomTabs
-            title="Tasks:"
+            title="Category"
             headerColor="primary"
+            onClick={handleClickOnPending}
             tabs={[
               {
-                tabName: "Bugs",
-                tabIcon: BugReport,
+                tabName: "Pending",
+                tabIcon: DescriptionIcon,
                 tabContent: (
                   <Tasks
-                    checkedIndexes={[0, 3]}
-                    tasksIndexes={[0, 1, 2, 3]}
-                    tasks={bugs}
-                  />
-                )
-              },
-              {
-                tabName: "Website",
-                tabIcon: Code,
-                tabContent: (
-                  <Tasks
-                    checkedIndexes={[0]}
-                    tasksIndexes={[0, 1]}
-                    tasks={website}
-                  />
-                )
-              },
-              {
-                tabName: "Server",
-                tabIcon: Cloud,
-                tabContent: (
-                  <Tasks
-                    checkedIndexes={[1]}
-                    tasksIndexes={[0, 1, 2]}
-                    tasks={server}
+                    checkedIndexes={[]}
+                    tasksIndexes={pendingDocumentsData.map(e => pendingDocumentsData.indexOf(e))}
+                    tasks={pendingDocumentsData.map(e => e.heading)}
+                    data={pendingDocumentsData}
+                    collectionName="pendingDocuments"
+                    onClick={handleClickOnPending}
                   />
                 )
               }
             ]}
           />
+          </div>
+
+          <div onClick={handleClickOnRejected}>
+          <CustomTabs
+            title="Category"
+            headerColor="primary"
+            onClick={handleClickOnRejected}
+            tabs={[
+              {
+                tabName: "Rejected",
+                tabIcon: ErrorIcon,
+                tabContent: (
+                  <Tasks
+                    checkedIndexes={[]}
+                    tasksIndexes={rejectedDocumentsData.map(e => rejectedDocumentsData.indexOf(e))}
+                    tasks={rejectedDocumentsData.map(e => e.heading)}
+                    data={rejectedDocumentsData}
+                    collectionName="rejectedDocuments"
+                  />
+                )
+              }
+            ]}
+          />
+          </div>
+        
         </GridItem>
         <GridItem xs={12} sm={12} md={6}>
-          <Card>
+          <Card onClick={handleClickOnRequested}>
             <CardHeader color="warning">
-              <h4 className={classes.cardTitleWhite}>Employees Stats</h4>
+              <h4 className={classes.cardTitleWhite}>Your Latest Requested Documents</h4>
               <p className={classes.cardCategoryWhite}>
-                New employees on 15th September, 2016
+                You have requested the following documents
               </p>
             </CardHeader>
             <CardBody>
               <Table
                 tableHeaderColor="warning"
-                tableHead={["ID", "Name", "Salary", "Country"]}
-                tableData={[
-                  ["1", "Dakota Rice", "$36,738", "Niger"],
-                  ["2", "Minerva Hooper", "$23,789", "Curaçao"],
-                  ["3", "Sage Rodriguez", "$56,142", "Netherlands"],
-                  ["4", "Philip Chaney", "$38,735", "Korea, South"]
-                ]}
+                tableHead={["ID", "Heading", "Description", "Extension"]}
+                tableData={
+                  // [[0,"Thomas","Danutu","csv"]]
+                  requestedDocumentsData.map((e, index) => [index, e.heading, e.description, e.extension]) || []
+                }
               />
             </CardBody>
           </Card>
         </GridItem>
+
+        
       </GridContainer>
+    
+      {
+        // here we add the data for alerts
+        <Snackbar
+          place="tc"
+          color={succesAlert ? "success" : "danger"}
+          icon={AddAlert}
+          message={succesAlert ? "Thank you! Your message has been successfully sent. We will contact you very soon!" : 
+            "We are very sory but something went wrong with your request. Please try again!"}
+          open={succesAlert || errorAlert}
+          closeNotification={() => setSuccesAlert(false) && setErrorAlert(false)}
+          close
+        />
+      }
+
     </div>
   );
 }

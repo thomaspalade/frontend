@@ -139,7 +139,7 @@ material-dashboard-react
     │   ├── Navbars
     │   │   ├── AdminNavbarLinks.js
     │   │   ├── Navbar.js
-    │   │   └── RTLNavbarLinks.js
+    │   │   
     │   ├── Sidebar
     │   │   └── Sidebar.js
     │   ├── Snackbar

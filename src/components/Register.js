@@ -4,7 +4,8 @@ import Input from "react-validation/build/input";
 import CheckButton from "react-validation/build/button";
 import { isEmail } from "validator";
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
+// import Button from '@material-ui/core/Button';
+import Button from "components/CustomButtons/Button.js";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -16,6 +17,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import AddAlert from "@material-ui/icons/AddAlert";
+import Snackbar from "components/Snackbar/Snackbar.js";
 
 import AuthService from "../services/auth.service";
 
@@ -24,7 +27,7 @@ function Copyright() {
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        Thomas-Emanuel Palade
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -41,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: '#9c27b0',
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -103,6 +106,8 @@ const Register = (props) => {
   const [password, setPassword] = useState("");
   const [successful, setSuccessful] = useState(false);
   const [message, setMessage] = useState("");
+  const [succesAlert, setSuccesAlert] = useState(false);
+  const [errorAlert, setErrorAlert] = useState(false);
 
   const classes = useStyles();
   const [fName, setfName] = useState('');
@@ -111,13 +116,11 @@ const Register = (props) => {
 
   const onChangeUsername = (e) => {
     const username = e.target.value;
-    console.log("here inside onChangeUsername");
     setUsername(username);
   };
 
   const onChangeEmail = (e) => {
     const email = e.target.value;
-    console.log("here inside onChangeEmail");
     setEmail(email);
   };
 
@@ -128,14 +131,35 @@ const Register = (props) => {
 
   const onChangeFirstName = (e) => {
     const firstName = e.target.value;
-    console.log("here inside onChangeFirstName");
     setFirstName(firstName);
   };
 
   const onChangeLastName = (e) => {
     const lastName = e.target.value;
-    console.log("here inside onChangeLastName");
     setLastName(lastName);
+  };
+
+  const showNotification = place => {
+    switch (place) {
+      case "succesAlert":
+        if (!succesAlert) {
+          setSuccesAlert(true);
+          setTimeout(function() {
+            setSuccesAlert(false);
+          }, 4000);
+        }
+        break;
+      case "errorAlert":
+        if (!errorAlert) {
+          setErrorAlert(true);
+          setTimeout(function() {
+            setErrorAlert(false);
+          }, 4000);
+        }
+        break;
+      default:
+        break;
+    }
   };
 
   const handleRegister = (e) => {
@@ -145,16 +169,14 @@ const Register = (props) => {
     setSuccessful(false);
 
     form.current.validateAll();
-    console.log("here 1");
     console.log(checkBtn.current.context._errors);
     // if (checkBtn.current.context._errors.length === 0) {
-      console.log("here 2");
       AuthService.register(username, email, password, firstName, lastName).then(
         // ne propunem sa se logheze cu emailul
         (response) => {
+          showNotification("succesAlert");
           setMessage(response.data.message);
           setSuccessful(true);
-          console.log("here 1");
           props.history.push("/profile");
           window.location.reload();
         },
@@ -165,7 +187,7 @@ const Register = (props) => {
               error.response.data.message) ||
             error.message ||
             error.toString();
-
+          showNotification("errorAlert");
           setMessage(resMessage);
           setSuccessful(false);
         }
@@ -174,8 +196,6 @@ const Register = (props) => {
 
   return (
     <div>
-
-      
       <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -282,7 +302,6 @@ const Register = (props) => {
                 </div>
               )}
 
-
             </Grid>
           </Grid>
           <Button
@@ -297,7 +316,7 @@ const Register = (props) => {
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link href="#" variant="body2" style={{color: '#002000'}}>
                 Already have an account? Sign in
               </Link>
             </Grid>
@@ -309,11 +328,8 @@ const Register = (props) => {
       </Box>
     </Container>
 
-
     {
-        
       <div style={{display: 'none'}}>
-
         <div className="col-md-12">
           <div className="card card-container">
             <img
@@ -373,6 +389,23 @@ const Register = (props) => {
         </div>
         </div>
     }
+
+      <div>
+      {
+        // here we add the data for alerts
+        <Snackbar
+          place="tc"
+          color={succesAlert ? "success" : "danger"}
+          icon={AddAlert}
+          message={succesAlert ? "Thank you! Your message has been successfully sent. We will contact you very soon!" : 
+            "We are very sory but something went wrong with your request. Please try again!"}
+          open={succesAlert || errorAlert}
+          closeNotification={() => setSuccesAlert(false) && setErrorAlert(false)}
+          close
+        />
+      }
+      </div>
+
     </div>
   );
 };

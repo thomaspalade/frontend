@@ -13,10 +13,18 @@ import Contact from "views/Contact/Contact.js";
 import PdfViewer from "views/Icons/Icons.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
 import Feedback from "views/Feedback/Feedback.js";
+import PendingDocuments from "views/PendingDocuments/PendingDocuments.js";
+import RejectedDocuments from "views/RejectedDocuments/RejectedDocuments.js";
+import RequestDocument from "views/RequestDocument/RequestDocument.js";
+import PublicCodes from "views/PublicCodes/PublicCodes.js";
 import AboutUs from "views/AboutUs/AboutUs.js";
 import Album from "components/Album/Album.js";
+import Upload from "components/Upload/Upload.js";
+import EditFile from "components/EditFile/EditFile.js";
 import Login from "components/Login.js";
 import Register from "components/Register.js";
+import ResetPassword from "components/ResetPassword.js";
+import ResetPasswordPage from "components/ResetPasswordPage.js";
 
 const dashboardRoutes = [
   {
@@ -34,10 +42,59 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
+    path: "/album",
+    name: "My Documents",
+    icon: Person,
+    component: Album,
+    layout: "/admin"
+  },
+  {
+    path: "/upload",
+    name: "Upload Document",
+    icon: Person,
+    component: Upload,
+    layout: "/admin"
+  },
+  {
+    path: "/request",
+    name: "Request Document",
+    icon: Person,
+    component: RequestDocument,
+    layout: "/admin"
+  },
+  {
+    path: "/pending",
+    name: "Pending Documents",
+    icon: Person,
+    component: PendingDocuments,
+    layout: "/admin"
+  },
+  {
+    path: "/rejected",
+    name: "Rejected Documents",
+    icon: Person,
+    component: RejectedDocuments,
+    layout: "/admin"
+  },
+  {
+    path: "/publiccodes",
+    name: "Public Codes",
+    icon: Person,
+    component: PublicCodes,
+    layout: "/admin"
+  },
+  {
     path: "/contact",
     name: "Contact",
     icon: LibraryBooks,
     component: Contact,
+    layout: "/admin"
+  },
+  {
+    path: "/aboutus",
+    name: "About us",
+    icon: Person,
+    component: AboutUs,
     layout: "/admin"
   },
   {
@@ -47,6 +104,14 @@ const dashboardRoutes = [
     component: Faq,
     layout: "/admin"
   },
+  {
+    path: "/feedback",
+    name: "Feedback",
+    icon: Person,
+    component: Feedback,
+    layout: "/admin"
+  },
+  /*
   {
     path: "/pdfviewer",
     name: "Icons",
@@ -61,13 +126,7 @@ const dashboardRoutes = [
     component: NotificationsPage,
     layout: "/admin"
   },
-  {
-    path: "/album",
-    name: "Album",
-    icon: Person,
-    component: Album,
-    layout: "/admin"
-  }, 
+  */
   {
     path: "/login",
     name: "Login",
@@ -83,17 +142,24 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/aboutus",
-    name: "About us",
+    path: "/resetpasswordpage",
+    name: "Reset Password Page",
     icon: Person,
-    component: AboutUs,
+    component: ResetPasswordPage,
     layout: "/admin"
   },
   {
-    path: "/feedback",
-    name: "Feedback",
+    path: "/resetpassword/:id",
+    name: "Reset Password",
     icon: Person,
-    component: Feedback,
+    component: ResetPassword,
+    layout: "/admin"
+  },
+  {
+    path: "/edit/:id",
+    name: "Edit File",
+    icon: Person,
+    component: EditFile,
     layout: "/admin"
   }
 ];

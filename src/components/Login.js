@@ -3,7 +3,7 @@ import Form from "react-validation/build/form";
 import Input from "react-validation/build/input";
 import CheckButton from "react-validation/build/button";
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
+// import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -15,15 +15,17 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-
+import Button from "components/CustomButtons/Button.js";
 import AuthService from "../services/auth.service";
+import AddAlert from "@material-ui/icons/AddAlert";
+import Snackbar from "components/Snackbar/Snackbar.js";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+      <Link color="inherit" href="http://localhost:8081/admin/dashboard/">
+      Thomas-Emanuel Palade
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -40,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: '#9c27b0',
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -69,6 +71,8 @@ const Login = (props) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [succesAlert, setSuccesAlert] = useState(false);
+  const [errorAlert, setErrorAlert] = useState(false);
 
   const classes = useStyles();
   const [mail, setMail] = useState('');
@@ -83,6 +87,29 @@ const Login = (props) => {
     setPassword(password);
   };
 
+  const showNotification = place => {
+    switch (place) {
+      case "succesAlert":
+        if (!succesAlert) {
+          setSuccesAlert(true);
+          setTimeout(function() {
+            setSuccesAlert(false);
+          }, 4000);
+        }
+        break;
+      case "errorAlert":
+        if (!errorAlert) {
+          setErrorAlert(true);
+          setTimeout(function() {
+            setErrorAlert(false);
+          }, 4000);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
 
@@ -92,16 +119,11 @@ const Login = (props) => {
     form.current.validateAll();
 
     if (checkBtn.current.context._errors.length === 0) {
-
-      console.log(username, password);
-
       AuthService.login(username, password).then(
         () => {
-          // console.log("here 2");  
+          showNotification("succesAlert");
           props.history.push("/profile");
           window.location.reload();
-          // const currentUser = AuthService.getCurrentUser();
-          // console.log(JSON.stringify(currentUser));
         },
         (error) => {
           const resMessage =
@@ -110,7 +132,7 @@ const Login = (props) => {
               error.response.data.message) ||
             error.message ||
             error.toString();
-
+          showNotification("errorAlert");
           setLoading(false);
           setMessage(resMessage);
         }
@@ -122,7 +144,6 @@ const Login = (props) => {
 
   return (
       <div>
-        
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
@@ -172,10 +193,10 @@ const Login = (props) => {
               onChange={onChangePassword}
               validations={[required]}
             />
-            <FormControlLabel
+            {false && <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
-            />
+            />}
             <Button
               type="submit"
               fullWidth
@@ -195,12 +216,12 @@ const Login = (props) => {
           )}
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                <Link href="#" variant="body2" style={{color: '#002000'}}>
                   Forgot password?
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="#" variant="body2" style={{color: '#002000'}}>
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
@@ -214,7 +235,6 @@ const Login = (props) => {
 
 
     {
-        
       <div style={{display: 'none'}}>
         <div className="card card-container">
           <img
@@ -261,8 +281,22 @@ const Login = (props) => {
           </Form>
         </div>
       </div>
-    
     }
+    
+    {
+        // here we add the data for alerts
+        <Snackbar
+          place="tc"
+          color={succesAlert ? "success" : "danger"}
+          icon={AddAlert}
+          message={succesAlert ? "Thank you! Your message has been successfully sent. We will contact you very soon!" : 
+            "We are very sory but something went wrong with your request. Please try again!"}
+          open={succesAlert || errorAlert}
+          closeNotification={() => setSuccesAlert(false) && setErrorAlert(false)}
+          close
+        />
+      }
+
     </div>
   );
 };

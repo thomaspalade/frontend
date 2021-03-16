@@ -1,4 +1,3 @@
-import React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 // @material-ui/core components
@@ -10,8 +9,10 @@ import Table from "@material-ui/core/Table";
 import TableRow from "@material-ui/core/TableRow";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
+import React, { useState, useEffect } from "react";
 // @material-ui/icons
-import Edit from "@material-ui/icons/Edit";
+import Edit from "@material-ui/icons/Check";
+
 import Close from "@material-ui/icons/Close";
 import Check from "@material-ui/icons/Check";
 // core components
@@ -22,74 +23,39 @@ const useStyles = makeStyles(styles);
 export default function Tasks(props) {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([...props.checkedIndexes]);
+  const { tasksIndexes, tasks, data, collectionName } = props;
+  const tableCellClasses = classnames(classes.tableCell);
+  const tableCellClasses2 = classnames(classes.tableCell2);
   const handleToggle = value => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-    setChecked(newChecked);
   };
-  const { tasksIndexes, tasks, rtlActive } = props;
-  const tableCellClasses = classnames(classes.tableCell, {
-    [classes.tableCellRTL]: rtlActive
-  });
+
+  const handleRemove = value => {
+    console.log("handle remove");
+    // tasks.splice(0, 2);
+    const currentIndex = value;
+    console.log("value = " + value);
+    console.log("currentIndex=" + currentIndex);
+    console.log(tasks, tasksIndexes, data);
+    tasks.splice(currentIndex, 1);
+    tasksIndexes.splice(currentIndex, 1);
+    data.splice(currentIndex, 1);
+    console.log(tasks, tasksIndexes, data);
+  };
+
   return (
     <Table className={classes.table}>
       <TableBody>
+      <TableRow key={"tomi"} className={classes.headerRow}>
+      <TableCell className={tableCellClasses2}>{"Title"}</TableCell>
+      <TableCell className={tableCellClasses2}>{"Type"}</TableCell>
+      <TableCell className={tableCellClasses2}>{"Uploader Mail"}</TableCell>
+      </TableRow>
         {tasksIndexes.map(value => (
           <TableRow key={value} className={classes.tableRow}>
-            <TableCell className={tableCellClasses}>
-              <Checkbox
-                checked={checked.indexOf(value) !== -1}
-                tabIndex={-1}
-                onClick={() => handleToggle(value)}
-                checkedIcon={<Check className={classes.checkedIcon} />}
-                icon={<Check className={classes.uncheckedIcon} />}
-                classes={{
-                  checked: classes.checked,
-                  root: classes.root
-                }}
-              />
-            </TableCell>
             <TableCell className={tableCellClasses}>{tasks[value]}</TableCell>
-            <TableCell className={classes.tableActions}>
-              <Tooltip
-                id="tooltip-top"
-                title="Edit Task"
-                placement="top"
-                classes={{ tooltip: classes.tooltip }}
-              >
-                <IconButton
-                  aria-label="Edit"
-                  className={classes.tableActionButton}
-                >
-                  <Edit
-                    className={
-                      classes.tableActionButtonIcon + " " + classes.edit
-                    }
-                  />
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                id="tooltip-top-start"
-                title="Remove"
-                placement="top"
-                classes={{ tooltip: classes.tooltip }}
-              >
-                <IconButton
-                  aria-label="Close"
-                  className={classes.tableActionButton}
-                >
-                  <Close
-                    className={
-                      classes.tableActionButtonIcon + " " + classes.close
-                    }
-                  />
-                </IconButton>
-              </Tooltip>
+            <TableCell className={tableCellClasses}>{data[value].extension}</TableCell>
+            <TableCell className={tableCellClasses}>{data[value].uploaderEmail}</TableCell>
+            <TableCell className={classes.tableActions}> 
             </TableCell>
           </TableRow>
         ))}
@@ -101,6 +67,7 @@ export default function Tasks(props) {
 Tasks.propTypes = {
   tasksIndexes: PropTypes.arrayOf(PropTypes.number),
   tasks: PropTypes.arrayOf(PropTypes.node),
-  rtlActive: PropTypes.bool,
-  checkedIndexes: PropTypes.array
+  checkedIndexes: PropTypes.array,
+  data: PropTypes.object,
+  collectionName: PropTypes.string
 };
