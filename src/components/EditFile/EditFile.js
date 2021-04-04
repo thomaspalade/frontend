@@ -24,6 +24,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import AddAlert from "@material-ui/icons/AddAlert";
 import Snackbar from "components/Snackbar/Snackbar.js";
+import { useHistory } from "react-router-dom";
 
 /*
 import app from "assets/img/fileExtentions/png/003-app.png";
@@ -244,8 +245,16 @@ export default function Album() {
   const [heading, setHeading] = useState('');
   const [description, setDescription] = useState('');
   const [extension, setExtension] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const onChangeDocument = (e) => {
+  const [files, setFiles] = useState([]);
+
+  let history = useHistory();
+
+  const handleChangeFiles = (files) => {
+    console.log("here baby");
+    console.log(files);
+    setFiles(files);
   };
 
   const handleChange = (event) => {
@@ -274,7 +283,7 @@ export default function Album() {
     setExtension(extension);
   };
 
-  const showNotification = place => {
+  const showNotification = (place, customMessage) => {
     switch (place) {
       case "succesAlert":
         if (!succesAlert) {
@@ -287,6 +296,7 @@ export default function Album() {
       case "errorAlert":
         if (!errorAlert) {
           setErrorAlert(true);
+          setErrorMessage(customMessage);
           setTimeout(function() {
             setErrorAlert(false);
           }, 4000);
@@ -421,47 +431,63 @@ export default function Album() {
     UserService.getCurrentUser1().then(
       (response) => {
         console.log(response);
-        // HERE FOARTE IMPORTANT
-        // daca s-a intors aici cu response ok atunci s-a autentificat bine si pot face orice actiune
-        // adica token-ul e bine bine
         console.log(JSON.stringify(response.data.id));
         const fileId = window.location.href.slice(33, window.location.href.length);
         console.log(fileId);
-        axios.put("http://localhost:5000/document/" + fileId, {
-          userId: response.data.id,
-          heading: heading,
-          extension: extension,
-          tags: chipData.map(e => e.label),
-          sharedWith: chipDataCodes.map(e => e.label),
-          description: description
-        }).then(res => {
-          showNotification("succesAlert");
-          console.log(res);
-          console.log(JSON.stringify(res.data));
-          window.location.reload(false); 
-          
-          // window.location.reload(false); 
-          // s-a intors un raspuns bun
-          }).catch((error) => {
-            // Error
-            showNotification("errorAlert");
-            if (error.response) {
-              // The request was made and the server responded with a status code
-              // that falls out of the range of 2xx
-              // console.log(error.response.data);
-              console.log(error.response.status);
-              if (error.response.status === 400) {
-                // username-ul este deja utilizat de altcineva, incearca cu altul
-              }
-              console.log(error.response.headers);
-            } else if (error.request) {
-              console.log(error.request);
-            } else {
-              // Something happened in setting up the request that triggered an Error
-            }
-            console.log(error.config);
-            console.log(error);
-          });
+        // first upload the file to amazon aws s3 bucket
+        // if that happens succesfully, then get the url location
+        // and store everything in the database
+        const data = new FormData();
+        data.append("name", "tomitza"); // real file.name
+        data.append("file", files[0]);  // only one file
+        if (!files[0]) {
+          console.log("empty files");
+          showNotification("errorAlert", "You didn't upload any file. Upload file and try again, please.");
+        } else {
+          axios.post("http://localhost:5000/upload/file", data)
+            .then(res => {
+              axios.put("http://localhost:5000/document/" + fileId, {
+                userId: response.data.id,
+                heading: heading,
+                extension: extension,
+                tags: chipData.map(e => e.label),
+                sharedWith: chipDataCodes.map(e => e.label),
+                description: description,
+                locationUrl: res.data
+              }).then(res => {
+                showNotification("succesAlert");
+                console.log(res);
+                console.log(JSON.stringify(res.data));
+                // window.location.reload(false); 
+                setTimeout(function() {
+                  history.push("/admin/" + "album");
+                }, 3000);
+                }).catch((error) => {
+                  // Error
+                  showNotification("errorAlert", "We are very sory but something went wrong with your request. Please try again!");
+                  if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    // console.log(error.response.data);
+                    console.log(error.response.status);
+                    if (error.response.status === 400) {
+                      // username-ul este deja utilizat de altcineva, incearca cu altul
+                    }
+                    console.log(error.response.headers);
+                  } else if (error.request) {
+                    console.log(error.request);
+                  } else {
+                    // Something happened in setting up the request that triggered an Error
+                  }
+                  console.log(error.config);
+                  console.log(error);
+                });
+
+            }).catch(err => {
+              // something bad happend during the aws file upload
+              console.log(err);
+            });
+          }
 
           }).catch((error) => {
             // Error
@@ -490,26 +516,21 @@ export default function Album() {
       UserService.getCurrentUser1().then(
         (response) => {
           console.log(response);
-          // HERE FOARTE IMPORTANT
-          // daca s-a intors aici cu response ok atunci s-a autentificat bine si pot face orice actiune
-          // adica token-ul e bine bine
           console.log(JSON.stringify(response.data.id));
           const fileId = window.location.href.slice(33, window.location.href.length);
           console.log(fileId);
-          axios.put("http://localhost:5000/document/" + fileId, {
+          console.log(response.data.id);
+          console.log(chipDataCodes.map(e => e.label));
+          axios.post("http://localhost:5000/documentDelete/" + fileId, {
             userId: response.data.id,
-            heading: heading,
-            extension: extension,
-            tags: chipData.map(e => e.label),
             sharedWith: chipDataCodes.map(e => e.label),
-            description: description
           }).then(res => {
             showNotification("succesAlert");
             console.log(res);
             console.log(JSON.stringify(res.data));
-            window.location.reload(false); 
-            
-            // window.location.reload(false); 
+            setTimeout(function() {
+              history.push("/admin/" + "album");
+            }, 3000);
             // s-a intors un raspuns bun
             }).catch((error) => {
               // Error
@@ -723,7 +744,9 @@ export default function Album() {
 
           <Grid item xs={7}>
             <div style={{marginTop: "20px"}}>
-          <DropzoneAreaExample/>
+            <DropzoneArea
+              onChange={handleChangeFiles}
+            />
             </div>
 
           </Grid>
@@ -732,10 +755,7 @@ export default function Album() {
       </Grid>
       </div>
 
-
       <div>
-
-
 
 
       <Button style={{float: 'left', marginTop: '25px', marginBottom: '25px', marginLeft: "15px"}} 
@@ -745,7 +765,6 @@ export default function Album() {
               color="primary" onClick={handleDeleteDocument}>Delete Document</Button>
         </div>
 
-        
         </Card>
     </div>
       
@@ -757,7 +776,7 @@ export default function Album() {
           color={succesAlert ? "success" : "danger"}
           icon={AddAlert}
           message={succesAlert ? "Thank you! Your message has been successfully sent. We will contact you very soon!" : 
-            "We are very sory but something went wrong with your request. Please try again!"}
+            errorMessage}
           open={succesAlert || errorAlert}
           closeNotification={() => setSuccesAlert(false) && setErrorAlert(false)}
           close

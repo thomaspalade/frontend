@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 import AuthService from "./services/auth.service";
+import dotenv from 'dotenv';
 
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -12,6 +13,8 @@ import Profile from "./components/Profile";
 import BoardUser from "./components/BoardUser";
 import BoardModerator from "./components/BoardModerator";
 import BoardAdmin from "./components/BoardAdmin";
+
+dotenv.config();
 
 const App = () => {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);

@@ -29,6 +29,7 @@ const useStylesPaperPdf = makeStyles((theme) => ({
     flexGrow: 1,
     overflow: 'hidden',
     padding: theme.spacing(0, 3),
+    marginTop: "-30px"
   },
   paper: {
     maxWidth: 1100,
@@ -41,22 +42,10 @@ export default function Icons() {
   const classes = useStylesPaperPdf();
   return (
     <div className={classes.root}>
-      <Paper className={classes.paper}>
-        <Grid container wrap="nowrap" spacing={2}>
-          <Grid item>
-          </Grid>
-          <Grid item xs>
-            <Typography>{message}</Typography>
-          </Grid>
-        </Grid>
-        <Grid container wrap="nowrap" spacing={2}>
-          <Grid item>
-          </Grid>
-          <Grid item xs>
-            <PdfViewer/>
-          </Grid>
-        </Grid>
-      </Paper>
+      {
+        <object width="100%" height="1000" data="https://documente-licenta.s3.eu-central-1.amazonaws.com/documents/sample_tomi.pdf" type="application/pdf">   </object>
+        // <object width="100%" height="1000" data="http://www.africau.edu/images/default/sample.pdf" type="application/pdf">   </object>
+      }
     </div>
   );
 }

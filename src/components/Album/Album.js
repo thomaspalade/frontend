@@ -17,6 +17,7 @@ import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
 import axios from 'axios';
 import { useHistory } from "react-router-dom";
+var AWS = require('aws-sdk');
 
 function Copyright() {
   return (
@@ -122,6 +123,63 @@ export default function Album() {
   const onRequestDocumentSearch = (e) => {
     getAllUserExistingDocuments();
   };
+
+  let alternativeDownloadImage = () => {
+    var albumBucketName = "documente-licenta";
+
+    // **DO THIS**:
+    //   Replace this block of code with the sample code located at:
+    //   Cognito -- Manage Identity Pools -- [identity_pool_name] -- Sample Code -- JavaScript
+    //
+    // Initialize the Amazon Cognito credentials provider
+    AWS.config.region = 'eu-central-1'; // Region
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: 'IDENTITY_POOL_ID',
+    });
+
+    // Create a new service object
+    var s3 = new AWS.S3({
+      apiVersion: '2006-03-01',
+      params: {Bucket: albumBucketName}
+    });
+  };
+
+  let getSignedUrlFunction = (event, fileLocationUrl) => {
+    console.log(fileLocationUrl);
+    window.open(fileLocationUrl, '_blank');
+  };
+
+  let downloadImage = () => {
+    // window.open('https://documente-licenta.s3.eu-central-1.amazonaws.com/documents/Screenshot%202021-04-01%20at%2013.43.10.png', '_blank');
+    window.open('https://documente-licenta.s3.eu-central-1.amazonaws.com/documents/sample_tomi.pdf', '_blank');
+    // s3://documente-licenta/documents/sample_tomi.pdf
+
+    // https://documente-licenta.s3.eu-central-1.amazonaws.com/documents/Screenshot%202021-04-01%20at%2013.43.10.png
+
+    /*
+    let url = "https://documente-licenta.s3.eu-central-1.amazonaws.com/userAvatar/mens-button-up-shirt-urban-fashion.jpeg";
+    let urlArray = url.split("/")
+    let bucket = "documente-licenta";
+    let key = "userAvatar/mens-button-up-shirt-urban-fashion.jpeg"
+    AWS.config.update({region: 'eu-central-1'});
+    let params = {Bucket: bucket, Key: key}
+    let s3 = new AWS.S3({ params: { Bucket: "documente-licenta"}, region: 'eu-central-1'});
+    console.log(bucket);
+    console.log(key);
+
+    s3.getObject(params, (err, data) => {
+
+      console.log("here baby");
+      console.log(err);
+
+      let blob=new Blob([data.Body], {type: data.ContentType});
+      let link=document.createElement('a');
+      link.href=window.URL.createObjectURL(blob);
+      link.download=url;
+      link.click();
+    })
+    */
+  }
 
   const getFileExtensionImage = (extension) => {
     const stringEnd = (extension === 'app') ? '003-app.png' :
@@ -265,7 +323,8 @@ export default function Album() {
                   </CardContent>
                   <CardActions>
                   <Link color="inherit" href={"http://localhost:8081/admin/view/" + card._id}>
-                    <Button size="small" color="primary">
+                    <Button size="small" color="primary" 
+                      onClick={(event) => getSignedUrlFunction(event, card.locationUrl)}>
                       View
                     </Button>
                   </Link>

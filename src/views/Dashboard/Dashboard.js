@@ -394,14 +394,25 @@ export default function Dashboard(props) {
               </p>
             </CardHeader>
             <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["ID", "Heading", "Description", "Extension"]}
-                tableData={
-                  // [[0,"Thomas","Danutu","csv"]]
-                  requestedDocumentsData.map((e, index) => [index, e.heading, e.description, e.extension]) || []
-                }
-              />
+              {
+                requestedDocumentsData.length ?
+                  <Table
+                    tableHeaderColor="warning"
+                    tableHead={["ID", "Heading", "Description", "Extension"]}
+                    tableData={
+                      // [[0,"Thomas","Danutu","csv"]]
+                      requestedDocumentsData.map((e, index) => [index, e.heading, e.description, e.extension]) || []
+                    }
+                  /> 
+              :
+                <div style={{ 
+                  padding: "8px",
+                  verticalAlign: "middle",
+                  border: "none",
+                  lineHeight: "1.42857143",
+                  fontSize: "15px"
+              }}> Seems like you haven't requested any document yet. Click here to arrange this.</div> 
+              }
             </CardBody>
           </Card>
         </GridItem>

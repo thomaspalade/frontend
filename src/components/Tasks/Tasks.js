@@ -50,11 +50,17 @@ export default function Tasks(props) {
       <TableCell className={tableCellClasses2}>{"Type"}</TableCell>
       <TableCell className={tableCellClasses2}>{"Uploader Mail"}</TableCell>
       </TableRow>
-        {tasksIndexes.map(value => (
+        {tasksIndexes.length > 0 ? tasksIndexes.map(value => (
           <TableRow key={value} className={classes.tableRow}>
             <TableCell className={tableCellClasses}>{tasks[value]}</TableCell>
             <TableCell className={tableCellClasses}>{data[value].extension}</TableCell>
             <TableCell className={tableCellClasses}>{data[value].uploaderEmail}</TableCell>
+            <TableCell className={classes.tableActions}> 
+            </TableCell>
+          </TableRow>
+        )) : [{extension: "ext", uploaderEmail: "email"}].map(value => (
+          <TableRow key={value} className={classes.tableRow}>
+            <TableCell className={tableCellClasses}>{"Seems like you have none here. Click here to arrange this."}</TableCell>
             <TableCell className={classes.tableActions}> 
             </TableCell>
           </TableRow>

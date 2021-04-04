@@ -111,7 +111,6 @@ const dashboardRoutes = [
     component: Feedback,
     layout: "/admin"
   },
-  /*
   {
     path: "/pdfviewer",
     name: "Icons",
@@ -119,14 +118,6 @@ const dashboardRoutes = [
     component: PdfViewer,
     layout: "/admin"
   },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    icon: Notifications,
-    component: NotificationsPage,
-    layout: "/admin"
-  },
-  */
   {
     path: "/login",
     name: "Login",
