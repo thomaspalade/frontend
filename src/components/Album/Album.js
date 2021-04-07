@@ -19,18 +19,48 @@ import axios from 'axios';
 import { useHistory } from "react-router-dom";
 var AWS = require('aws-sdk');
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="http://localhost:8081/admin/dashboard">
-        My Docs by Thomas-Emanuel Palade - 
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+const mimeTypeMap = {
+	"audio/aac": "aac",
+	"application/x-abiword": "abw",
+	"application/octet-stream": "bin",
+	"image/bmp": "bmp",
+	"application/x-bzip": "bz",
+	"text/css": "css",
+	"text/csv": "csv",
+	"application/msword": "doc",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+	"image/gif": "gif",
+	"text/html": "html",
+	"image/vnd.microsoft.icon": "ico",
+	"image/jpeg": "jpg",
+	"text/javascript": "js",
+	"application/json": "json",
+	"text/javascript": "mjs",
+	"video/mp4": "mp4",
+	"video/mpeg": "mpeg",
+	"application/vnd.oasis.opendocument.spreadsheet": "ods",
+	"application/vnd.oasis.opendocument.text": "odt",
+	"font/otf": "otf",
+	"image/png": "png",
+	"application/pdf": "pdf",
+	"application/x-httpd-php": "php",
+	"application/vnd.ms-powerpoint": "ppt",
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+	"application/vnd.rar": "rar",
+	"application/rtf": "rtf",
+	"image/svg+xml": "svg",
+	"application/x-tar": "tar",
+	"image/tiff": "tiff",
+	"text/plain": "txt",
+	"audio/wav": "wav",
+	"application/xhtml+xml": "xhtml",
+	"application/vnd.ms-excel": "xls",
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+	"application/xml": "xml",
+	"text/xml": "xml",
+	"application/zip": "zip",
+	"application/x-7z-compressed": "7z"
+};
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -144,9 +174,20 @@ export default function Album() {
     });
   };
 
-  let getSignedUrlFunction = (event, fileLocationUrl) => {
-    console.log(fileLocationUrl);
-    window.open(fileLocationUrl, '_blank');
+  let getSignedUrlFunction = (event, fileLocationUrl, extension) => {
+    console.log(fileLocationUrl.slice(66, fileLocationUrl.length));
+    var exactFileName = fileLocationUrl.slice(66, fileLocationUrl.length);
+    if (getCategory(extension)) {
+      history.push("/admin/" + "viewer/" + exactFileName);
+    } else {
+      window.open(fileLocationUrl, '_blank');
+    }
+    
+    // window.open(fileLocationUrl, '_blank');
+  };
+
+  let getCategory = (extension) => {
+    return (extension === "application/pdf"); 
   };
 
   let downloadImage = () => {
@@ -182,24 +223,44 @@ export default function Album() {
   }
 
   const getFileExtensionImage = (extension) => {
-    const stringEnd = (extension === 'app') ? '003-app.png' :
-      (extension === 'css') ? '008-css.png' :
-      (extension === 'csv') ? '009-csv.png' :
-      (extension === 'xls') ? '047-xls.png' :
-      (extension === 'doc') ? '012-doc.png' :
-      (extension === 'docx') ? '013-docx.png' :
-      (extension === 'exe') ? '017-exe.png' :
-      (extension === 'jar') ? '023-jar.png' :
-      (extension === 'jpeg') ? '024-jpeg.png' :
-      (extension === 'iso') ? '022-iso.png' :
-      (extension === 'jpg') ? '025-jpg.png' :
-      (extension === 'pdf') ? '032-pdf.png' :
-      (extension === 'otf') ? '034-otf.png' :
-      (extension === 'ppt') ? '037-ppt.png' :
-      (extension === 'rar') ? '040-rar.png' :
-      (extension === 'xlsx') ? '048-xlsx.png' :
-      (extension === 'zip') ? '050-zip.png' :
-      '013-docx.png';
+    console.log(extension);
+    console.log("----------------");
+    const actualExtension = mimeTypeMap[extension];
+    const stringEnd = (mimeTypeMap[extension] === 'app') ? '003-app.png' :
+      (actualExtension === 'css') ? '008-css.png' :
+      (actualExtension === 'csv') ? '009-csv.png' :
+      (actualExtension === 'xls') ? '047-xls.png' :
+      (actualExtension === 'doc') ? '012-doc.png' :
+      (actualExtension === 'docx') ? '013-docx.png' :
+      (actualExtension === 'exe') ? '017-exe.png' :
+      (actualExtension === 'jar') ? '023-jar.png' :
+      (actualExtension === 'jpeg') ? '024-jpeg.png' :
+      (actualExtension === 'iso') ? '022-iso.png' :
+      (actualExtension === 'jpg') ? '025-jpg.png' :
+      (actualExtension === 'pdf') ? '032-pdf.png' :
+      (actualExtension === 'otf') ? '034-otf.png' :
+      (actualExtension === 'ppt') ? '037-ppt.png' :
+      (actualExtension === 'rar') ? '040-rar.png' :
+      (actualExtension === 'xlsx') ? '048-xlsx.png' :
+      (actualExtension === 'zip') ? '050-zip.png' :
+      (actualExtension === 'dat') ? "010-dat format.png" :
+      (actualExtension === 'flv') ? "018-flv.png" :
+      (actualExtension === 'gif') ? "019-gif.png" :
+      (actualExtension === 'html') ? "020-html.png" :
+      (actualExtension === 'jar') ? "023-jar.png" :
+      (actualExtension === 'js') ? "026-js format.png" :
+      (actualExtension === 'mp3') ? "030-mp3.png" :
+      (actualExtension === 'mp4') ? "031-mp4.png" :
+      (actualExtension === 'php') ? "035-php.png" :
+      (actualExtension === 'png') ? "036-png.png" :
+      (actualExtension === 'sql') ? "041-sql.png" :
+      (actualExtension === 'svg') ? "043-svg.png" :
+      (actualExtension === 'ttf') ? "044-ttf.png" :
+      (actualExtension === 'txt') ? "045-txt.png" :
+      (actualExtension === 'wav') ? "046-wav format.png" :
+      (actualExtension === 'xls') ? "047-xls.png" :
+      (actualExtension === 'xml') ? "049-xml.png" :
+        '013-docx.png';
 
     return require('assets/img/fileExtentions/png/' + stringEnd);
   };
@@ -322,12 +383,15 @@ export default function Album() {
                     </Typography>
                   </CardContent>
                   <CardActions>
-                  <Link color="inherit" href={"http://localhost:8081/admin/view/" + card._id}>
                     <Button size="small" color="primary" 
-                      onClick={(event) => getSignedUrlFunction(event, card.locationUrl)}>
-                      View
+                      onClick={(event) => getSignedUrlFunction(event, card.locationUrl, card.extension)}>
+                      {
+                        getCategory(card.extension)
+                          ?
+                          "View" 
+                          : 
+                          "Download"}
                     </Button>
-                  </Link>
                   <Link color="inherit" href={"http://localhost:8081/admin/edit/" + card._id}>
                     <Button size="small" color="primary">
                       Edit

@@ -58,19 +58,6 @@ import xlsx from "assets/img/fileExtentions/png/048-xlsx.png";
 import zip from "assets/img/fileExtentions/png/050-zip.png";
 */
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="http://localhost:8081/admin/dashboard/">
-      Thomas-Emanuel Palade
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 const useStyles1 = makeStyles((theme) => ({
   icon: {
     marginRight: theme.spacing(2)
@@ -151,6 +138,49 @@ const MenuProps = {
       width: 250,
     },
   },
+};
+
+const mimeTypeMap = {
+	"audio/aac": "aac",
+	"application/x-abiword": "abw",
+	"application/octet-stream": "bin",
+	"image/bmp": "bmp",
+	"application/x-bzip": "bz",
+	"text/css": "css",
+	"text/csv": "csv",
+	"application/msword": "doc",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+	"image/gif": "gif",
+	"text/html": "html",
+	"image/vnd.microsoft.icon": "ico",
+	"image/jpeg": "jpg",
+	"text/javascript": "js",
+	"application/json": "json",
+	"text/javascript": "mjs",
+	"video/mp4": "mp4",
+	"video/mpeg": "mpeg",
+	"application/vnd.oasis.opendocument.spreadsheet": "ods",
+	"application/vnd.oasis.opendocument.text": "odt",
+	"font/otf": "otf",
+	"image/png": "png",
+	"application/pdf": "pdf",
+	"application/x-httpd-php": "php",
+	"application/vnd.ms-powerpoint": "ppt",
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+	"application/vnd.rar": "rar",
+	"application/rtf": "rtf",
+	"image/svg+xml": "svg",
+	"application/x-tar": "tar",
+	"image/tiff": "tiff",
+	"text/plain": "txt",
+	"audio/wav": "wav",
+	"application/xhtml+xml": "xhtml",
+	"application/vnd.ms-excel": "xls",
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+	"application/xml": "xml",
+	"text/xml": "xml",
+	"application/zip": "zip",
+	"application/x-7z-compressed": "7z"
 };
 
 const names = [
@@ -444,16 +474,22 @@ export default function Album() {
           console.log("empty files");
           showNotification("errorAlert", "You didn't upload any file. Upload file and try again, please.");
         } else {
+          console.log("not empty files");
           axios.post("http://localhost:5000/upload/file", data)
             .then(res => {
+              // file uploaded succesfully
+              console.log(res);
+              console.log(JSON.stringify(res.data.locationUrl));
+              console.log(JSON.stringify(res.data.extension));
+              setPersonName(res.data.extension);
               axios.put("http://localhost:5000/document/" + fileId, {
                 userId: response.data.id,
                 heading: heading,
-                extension: extension,
+                extension: res.data.extension,
                 tags: chipData.map(e => e.label),
                 sharedWith: chipDataCodes.map(e => e.label),
                 description: description,
-                locationUrl: res.data
+                locationUrl: res.data.locationUrl
               }).then(res => {
                 showNotification("succesAlert");
                 console.log(res);
@@ -646,22 +682,27 @@ export default function Album() {
 
           <div style={{marginLeft: "10px"}}>
             <FormControl className={classes2.formControl}>
-              <InputLabel id="demo-mutiple-name-label"> File extension </InputLabel>
-              <Select
-                labelId="demo-mutiple-name-label"
-                id="demo-mutiple-name"
-                
-                value={personName}
-                onChange={handleChange}
-                input={<Input />}
-                MenuProps={MenuProps}
-              >
-                {names.map((name) => (
-                  <MenuItem key={name} value={name} style={getStyles(name, personName, theme)}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                // required
+                fullWidth
+                style={{marginLeft: "0px"}}
+                id="description"
+                label="File extension"
+                // name="heading"
+                autoComplete="File extension"
+                // autoFocus
+                // onChange={e => setMail(e.target.value)}
+                type="File extension"
+                // className="form-control"
+                name="File extension"
+                value={mimeTypeMap[personName] || ''}
+                // value="Thomas"
+                // onChange={onChangeDescription}
+                // multiline
+                // validations={[required]}
+              />
             </FormControl>
           </div>
 

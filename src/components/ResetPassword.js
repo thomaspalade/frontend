@@ -18,6 +18,7 @@ import axios from 'axios';
 import AddAlert from "@material-ui/icons/AddAlert";
 import Snackbar from "components/Snackbar/Snackbar.js";
 import AuthService from "../services/auth.service";
+import { useHistory } from "react-router-dom";
 
 function Copyright() {
   return (
@@ -74,6 +75,7 @@ const ResetPassword = (props) => {
 
   const classes = useStyles();
   const [mail, setMail] = useState('');
+  let history = useHistory();
 
   const onChangeEmail = (e) => {
     const email = e.target.value;
@@ -105,13 +107,15 @@ const ResetPassword = (props) => {
 
   const handleResetPassword = (e) => {
     e.preventDefault();
-    axios.post("http://localhost:4001/forgotPassword/",{
+    setTimeout(function() { showNotification("succesAlert");}, 2000);
+    setTimeout(function() { history.push("/admin/" + "dashboard");}, 5000);
+    axios.post("http://localhost:5000/forgotPassword/",{
       "email": email,
     })
     .then(res => {
       console.log(res);
       showNotification("succesAlert");
-      // error handling above
+      setTimeout(function() { history.push("/admin/" + "dashboard");}, 2000);
       }
     ).catch((error) => {
       showNotification("errorAlert");

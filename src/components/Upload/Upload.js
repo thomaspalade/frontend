@@ -304,15 +304,18 @@ export default function Album() {
             .then(res => {
               // file uploaded succesfully
               console.log(res);
+              console.log(JSON.stringify(res.data.locationUrl));
+              console.log(JSON.stringify(res.data.extension));
+              setPersonName(res.data.extension);
               // extract location from res
               axios.post("http://localhost:5000/documents", {
                 userId: response.data.id,
                 heading: heading,
-                extension: personName,
+                extension: res.data.extension,
                 tags: chipData.map(e => e.label),
                 sharedWith: chipDataCodes.map(e => e.label),
                 description: description,
-                locationUrl: res.data
+                locationUrl: res.data.locationUrl
               }).then(res => {
                 showNotification("succesAlert");
                 console.log(JSON.stringify(res.data));
@@ -522,22 +525,27 @@ export default function Album() {
 
           <div style={{marginLeft: "10px"}}>
             <FormControl className={classes2.formControl}>
-              <InputLabel id="demo-mutiple-name-label"> File extension </InputLabel>
-              <Select
-                labelId="demo-mutiple-name-label"
-                id="demo-mutiple-name"
-                
-                value={personName}
-                onChange={handleChange}
-                input={<Input />}
-                MenuProps={MenuProps}
-              >
-                {names.map((name) => (
-                  <MenuItem key={name} value={name} style={getStyles(name, personName, theme)}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                // required
+                fullWidth
+                style={{marginLeft: "0px"}}
+                id="description"
+                label="File extension"
+                // name="heading"
+                autoComplete="File extension"
+                // autoFocus
+                // onChange={e => setMail(e.target.value)}
+                type="File extension"
+                // className="form-control"
+                name="File extension"
+                value={personName || ''}
+                // value="Thomas"
+                // onChange={onChangeDescription}
+                // multiline
+                // validations={[required]}
+              />
             </FormControl>
           </div>
 

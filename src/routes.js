@@ -112,7 +112,7 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/pdfviewer",
+    path: "/viewer/:id",
     name: "Icons",
     icon: BubbleChart,
     component: PdfViewer,
@@ -140,7 +140,7 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/resetpassword/:id",
+    path: "/resetpassword/",
     name: "Reset Password",
     icon: Person,
     component: ResetPassword,

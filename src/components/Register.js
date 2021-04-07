@@ -21,6 +21,7 @@ import AddAlert from "@material-ui/icons/AddAlert";
 import Snackbar from "components/Snackbar/Snackbar.js";
 
 import AuthService from "../services/auth.service";
+import { useHistory } from "react-router-dom";
 
 function Copyright() {
   return (
@@ -114,6 +115,8 @@ const Register = (props) => {
   const [lName, setlName] = useState('');
   const [mail, setMail] = useState('');
 
+  let history = useHistory();
+
   const onChangeUsername = (e) => {
     const username = e.target.value;
     setUsername(username);
@@ -177,8 +180,7 @@ const Register = (props) => {
           showNotification("succesAlert");
           setMessage(response.data.message);
           setSuccessful(true);
-          props.history.push("/profile");
-          window.location.reload();
+          setTimeout(function() { history.push("/admin/" + "login");}, 2000);
         },
         (error) => {
           const resMessage =

@@ -19,6 +19,7 @@ import Button from "components/CustomButtons/Button.js";
 import AuthService from "../services/auth.service";
 import AddAlert from "@material-ui/icons/AddAlert";
 import Snackbar from "components/Snackbar/Snackbar.js";
+import { useHistory } from "react-router-dom";
 
 function Copyright() {
   return (
@@ -76,6 +77,7 @@ const Login = (props) => {
 
   const classes = useStyles();
   const [mail, setMail] = useState('');
+  let history = useHistory();
 
   const onChangeUsername = (e) => {
     const username = e.target.value;
@@ -122,8 +124,7 @@ const Login = (props) => {
       AuthService.login(username, password).then(
         () => {
           showNotification("succesAlert");
-          props.history.push("/profile");
-          window.location.reload();
+          setTimeout(function() { history.push("/admin/" + "dashboard");}, 2000);
         },
         (error) => {
           const resMessage =
