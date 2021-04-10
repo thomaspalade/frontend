@@ -90,15 +90,12 @@ export default function CustomInput(props) {
     return "dashboard";
   }
   const handleKeyDown = (event) => {
-    console.log("here 1");
     if (event.key === 'Enter') {
-      console.log('do validate')
       const newLink = getRedirectLink();
       console.log(newLink);
       history.push("/admin/" + newLink);
       setInputText("");
     }
-    console.log("here 2");
   };
 
   return (

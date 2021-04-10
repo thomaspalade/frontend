@@ -277,6 +277,10 @@ export default function Album() {
   const [extension, setExtension] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  // url for amazon file
+  const [fileLocationUrl, setFileLocationUrl] = useState('');
+
+  // file upload
   const [files, setFiles] = useState([]);
 
   let history = useHistory();
@@ -350,6 +354,7 @@ export default function Album() {
           setDescription(res.data.description);
           setExtension(res.data.extension);
           setPersonName(res.data.extension);
+          setFileLocationUrl(res.data.locationUrl);
 
           let newChipData = [];
           for (var i = 0; i < res.data.tags.length; i++) {
@@ -464,6 +469,10 @@ export default function Album() {
         console.log(JSON.stringify(response.data.id));
         const fileId = window.location.href.slice(33, window.location.href.length);
         console.log(fileId);
+    
+        // let's set a flag so we don't have to reuplaod a file each time
+        let metaDataOnly = false;
+
         // first upload the file to amazon aws s3 bucket
         // if that happens succesfully, then get the url location
         // and store everything in the database
@@ -471,59 +480,96 @@ export default function Album() {
         data.append("name", "tomitza"); // real file.name
         data.append("file", files[0]);  // only one file
         if (!files[0]) {
-          console.log("empty files");
-          showNotification("errorAlert", "You didn't upload any file. Upload file and try again, please.");
-        } else {
-          console.log("not empty files");
-          axios.post("http://localhost:5000/upload/file", data)
-            .then(res => {
-              // file uploaded succesfully
-              console.log(res);
-              console.log(JSON.stringify(res.data.locationUrl));
-              console.log(JSON.stringify(res.data.extension));
-              setPersonName(res.data.extension);
-              axios.put("http://localhost:5000/document/" + fileId, {
-                userId: response.data.id,
-                heading: heading,
-                extension: res.data.extension,
-                tags: chipData.map(e => e.label),
-                sharedWith: chipDataCodes.map(e => e.label),
-                description: description,
-                locationUrl: res.data.locationUrl
-              }).then(res => {
-                showNotification("succesAlert");
-                console.log(res);
-                console.log(JSON.stringify(res.data));
-                // window.location.reload(false); 
-                setTimeout(function() {
-                  history.push("/admin/" + "album");
-                }, 3000);
-                }).catch((error) => {
-                  // Error
-                  showNotification("errorAlert", "We are very sory but something went wrong with your request. Please try again!");
-                  if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
-                    // console.log(error.response.data);
-                    console.log(error.response.status);
-                    if (error.response.status === 400) {
-                      // username-ul este deja utilizat de altcineva, incearca cu altul
-                    }
-                    console.log(error.response.headers);
-                  } else if (error.request) {
-                    console.log(error.request);
-                  } else {
-                    // Something happened in setting up the request that triggered an Error
-                  }
-                  console.log(error.config);
-                  console.log(error);
-                });
+          metaDataOnly = true;
+        }
 
-            }).catch(err => {
-              // something bad happend during the aws file upload
-              console.log(err);
-            });
-          }
+        console.log("not empty files");
+        !metaDataOnly && axios.post("http://localhost:5000/upload/file", data)
+          .then(res => {
+            // file uploaded succesfully
+            console.log(res);
+            console.log(JSON.stringify(res.data.locationUrl));
+            console.log(JSON.stringify(res.data.extension));
+            setPersonName(res.data.extension);
+            axios.put("http://localhost:5000/document/" + fileId, {
+              userId: response.data.id,
+              heading: heading,
+              extension: res.data.extension,
+              tags: chipData.map(e => e.label),
+              sharedWith: chipDataCodes.map(e => e.label),
+              description: description,
+              locationUrl: res.data.locationUrl
+            }).then(res => { 
+              showNotification("succesAlert");
+              console.log(res);
+              console.log(JSON.stringify(res.data));
+              // window.location.reload(false); 
+              setTimeout(function() {
+                history.push("/admin/" + "album");
+              }, 3000);
+              }).catch((error) => {
+                // Error
+                showNotification("errorAlert", "We are very sory but something went wrong with your request. Please try again!");
+                if (error.response) {
+                  // The request was made and the server responded with a status code
+                  // that falls out of the range of 2xx
+                  // console.log(error.response.data);
+                  console.log(error.response.status);
+                  if (error.response.status === 400) {
+                    // username-ul este deja utilizat de altcineva, incearca cu altul
+                  }
+                  console.log(error.response.headers);
+                } else if (error.request) {
+                  console.log(error.request);
+                } else {
+                  // Something happened in setting up the request that triggered an Error
+                }
+                console.log(error.config);
+                console.log(error);
+              });
+          }).catch(err => {
+            // something bad happend during the aws file upload
+            console.log(err);
+          });
+
+          // update metadata only here
+          metaDataOnly && axios.put("http://localhost:5000/document/" + fileId, {
+            userId: response.data.id,
+            heading: heading,
+            tags: chipData.map(e => e.label),
+            sharedWith: chipDataCodes.map(e => e.label),
+            description: description,
+            metaDataOnly: true
+          })
+          .then(res => {
+            showNotification("succesAlert");
+              console.log(res);
+              console.log(JSON.stringify(res.data));
+              // window.location.reload(false); 
+              setTimeout(function() {
+                history.push("/admin/" + "album");
+              }, 3000);
+          })
+          .catch(error => {
+            // Error
+            showNotification("errorAlert", "We are very sory but something went wrong with your request. Please try again!");
+            if (error.response) {
+              // The request was made and the server responded with a status code
+              // that falls out of the range of 2xx
+              // console.log(error.response.data);
+              console.log(error.response.status);
+              if (error.response.status === 400) {
+                // username-ul este deja utilizat de altcineva, incearca cu altul
+              }
+              console.log(error.response.headers);
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+            }
+            console.log(error.config);
+            console.log(error);
+          });
 
           }).catch((error) => {
             // Error
@@ -608,8 +654,25 @@ export default function Album() {
               console.log(error.config);
               console.log(error);
             });
-      };
+    };
+
+    const handleDownloadDocument = () => {
+      console.log('here inside handleDownloadDocument');
+      console.log(fileLocationUrl);
+      window.open(fileLocationUrl, '_blank');
+    };
+
+    const handleKeyDownForTags = (event) => {
+      if (event.key === 'Enter') {
+        handleNewTag();
+      }
+    };
   
+    const handleKeyDownForPublicCodes = (event) => {
+      if (event.key === 'Enter') {
+        handleNewCode();
+      }
+    };
 
   return (
     <div> 
@@ -643,7 +706,7 @@ export default function Album() {
             fullWidth
             style={{marginLeft: "15px"}}
             id="heading"
-            label="Heading"
+            label="Title"
             // name="heading"
             autoComplete="heading"
             autoFocus
@@ -680,32 +743,6 @@ export default function Album() {
             // validations={[required]}
           />
 
-          <div style={{marginLeft: "10px"}}>
-            <FormControl className={classes2.formControl}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                // required
-                fullWidth
-                style={{marginLeft: "0px"}}
-                id="description"
-                label="File extension"
-                // name="heading"
-                autoComplete="File extension"
-                // autoFocus
-                // onChange={e => setMail(e.target.value)}
-                type="File extension"
-                // className="form-control"
-                name="File extension"
-                value={mimeTypeMap[personName] || ''}
-                // value="Thomas"
-                // onChange={onChangeDescription}
-                // multiline
-                // validations={[required]}
-              />
-            </FormControl>
-          </div>
-
           <div style={{marginLeft: "20px", marginTop: "20px", fontSize: "18px"}}>
             Document tags helps us find your document easier. Add a few, please
           </div>
@@ -718,6 +755,7 @@ export default function Album() {
             onChange={onChangeNewTag}
             onBlur={handleNewTag}
             onSubmit={handleNewTag}
+            onKeyDown={handleKeyDownForTags}
           />
 
           <div component="ul" className={classes1.root}>
@@ -755,6 +793,7 @@ export default function Album() {
             onChange={onChangeNewCode}
             onBlur={handleNewCode}
             onSubmit={handleNewCode}
+            onKeyDown={handleKeyDownForPublicCodes}
           />
 
           <div component="ul" className={classes1.root}>
@@ -804,6 +843,9 @@ export default function Album() {
 
       <Button style={{float: 'left', marginTop: '25px', marginBottom: '25px', marginLeft: "15px"}} 
               color="primary" onClick={handleDeleteDocument}>Delete Document</Button>
+
+      <Button style={{float: 'left', marginTop: '25px', marginBottom: '25px', marginLeft: "15px"}} 
+              color="primary" onClick={handleDownloadDocument}>Download Document</Button>
         </div>
 
         </Card>

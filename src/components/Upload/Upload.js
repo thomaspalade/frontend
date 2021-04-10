@@ -455,6 +455,18 @@ export default function Album() {
     }
   };
 
+  const handleKeyDownForTags = (event) => {
+    if (event.key === 'Enter') {
+      handleNewTag();
+    }
+  };
+
+  const handleKeyDownForPublicCodes = (event) => {
+    if (event.key === 'Enter') {
+      handleNewCode();
+    }
+  };
+
   return (
     <div> 
       <div>
@@ -486,7 +498,7 @@ export default function Album() {
             fullWidth
             style={{marginLeft: "15px"}}
             id="heading"
-            label="Heading"
+            label="Title"
             // name="heading"
             autoComplete="heading"
             autoFocus
@@ -523,32 +535,6 @@ export default function Album() {
             // validations={[required]}
           />
 
-          <div style={{marginLeft: "10px"}}>
-            <FormControl className={classes2.formControl}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                // required
-                fullWidth
-                style={{marginLeft: "0px"}}
-                id="description"
-                label="File extension"
-                // name="heading"
-                autoComplete="File extension"
-                // autoFocus
-                // onChange={e => setMail(e.target.value)}
-                type="File extension"
-                // className="form-control"
-                name="File extension"
-                value={personName || ''}
-                // value="Thomas"
-                // onChange={onChangeDescription}
-                // multiline
-                // validations={[required]}
-              />
-            </FormControl>
-          </div>
-
           <div style={{marginLeft: "20px", marginTop: "20px", fontSize: "18px"}}>
             Document tags helps us find your document easier. Add a few, please
           </div>
@@ -561,6 +547,7 @@ export default function Album() {
             onChange={onChangeNewTag}
             onBlur={handleNewTag}
             onSubmit={handleNewTag}
+            onKeyDown={handleKeyDownForTags}
           />
 
           <div component="ul" className={classes1.root}>
@@ -598,6 +585,7 @@ export default function Album() {
             onChange={onChangeNewCode}
             onBlur={handleNewCode}
             onSubmit={handleNewCode}
+            onKeyDown={handleKeyDownForPublicCodes}
           />
 
           <div component="ul" className={classes1.root}>

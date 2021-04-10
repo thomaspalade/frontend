@@ -1,21 +1,39 @@
 import React, { useState, useEffect } from "react";
 // import Button from '@material-ui/core/Button';
 import Button from "components/CustomButtons/Button.js";
+
+import CardHeader from "components/Card/CardHeader.js";
+import CardBody from "components/Card/CardBody.js";
+
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import TextField from "@material-ui/core/TextField";
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
 import SearchBar from 'material-ui-search-bar';
 import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
+import GridItem from "components/Grid/GridItem.js";
+import GridContainer from "components/Grid/GridContainer.js";
+import Grid from '@material-ui/core/Grid';
 import axios from 'axios';
+import Chip from '@material-ui/core/Chip';
+
+// Libraries
+import ReactFetchImage, { fetchBase64 } from 'react-fetch-image'
+
+// Extra
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import { useHistory } from "react-router-dom";
 var AWS = require('aws-sdk');
 
@@ -62,6 +80,11 @@ const mimeTypeMap = {
 	"application/x-7z-compressed": "7z"
 };
 
+const googleDocsViewerSupportedFormats = [
+  "doc", "docx", "docs", "xls", "xlsx", "ppt", "pptx", "pdf", "pages", "ai", "psd", "svg", "ps", "ttf", "rtf",
+  "odt", "sxw", "ssv", "sxc", "ods", "sxi", "odp", "wdp"
+];
+
 const useStyles = makeStyles((theme) => ({
   icon: {
     marginRight: theme.spacing(2)
@@ -84,7 +107,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
   },
   cardMedia: {
-    paddingTop: '99.25%', // 16:9
+    paddingTop: '93.25%', // 16:9
   },
   cardContent: {
     flexGrow: 1,
@@ -93,14 +116,143 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(6),
   },
+  cardCategoryWhite: {
+    color: "rgba(255,255,255,.62)",
+    margin: "0",
+    fontSize: "14px",
+    marginTop: "0",
+    marginBottom: "0"
+  },
+  cardTitleWhite: {
+    color: "#FFFFFF",
+    marginTop: "20px",
+    minHeight: "auto",
+    fontWeight: "300",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    marginBottom: "3px",
+    textDecoration: "none"
+  }
+}));
+
+const useStyles1 = makeStyles((theme) => ({
+  icon: {
+    marginRight: theme.spacing(2)
+  },
+  heroContent: {
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(8, 0, 6),
+    marginBottom: "-30px"
+  },
+  heroButtons: {
+    marginTop: theme.spacing(4),
+  },
+  cardGrid: {
+    paddingTop: theme.spacing(8),
+    paddingBottom: theme.spacing(8),
+  },
+  card: {
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  cardMedia: {
+    paddingTop: '81.25%', // 16:9
+  },
+  cardContent: {
+    flexGrow: 1,
+  },
+  footer: {
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(6),
+  },
+  root: {
+    display: 'flex',
+    justifyContent: 'left',
+    marginLeft: 0,
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: 0,
+    marginTop: 0,
+    margin: 0,
+  },
+  media: {
+    height: 0,
+    paddingTop: "56.25%" // 16:9
+  },
+  avatar: {
+    backgroundColor: '#E1173F'
+  },
+  chip: {
+    margin: 10,
+  }
 }));
 
 export default function Album() {
   const classes = useStyles();
+  const classes1 = useStyles1();
   const [searchedDocument, setSearchedDocument] = useState("");
   const [documents, setDocuments] = useState([]);
   const [personal, setPersonal] = useState("personal");
   let history = useHistory();
+
+  const [open, setOpen] = React.useState(false);
+  const [fullWidth, setFullWidth] = React.useState(true);
+  const [maxWidth, setMaxWidth] = React.useState('lg');
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [extension, setExtension] = useState("");
+  const [locationUrl, setLocationUrl] = useState("");
+  const [tags, setTags] = useState([]);
+  const [sharedWith, setSharedWith] = useState([]);
+  
+  // used for document tags
+  const [chipData, setChipData] = useState([
+    {key: "tag1", label: "tag1"}, 
+    {key: "tag2", label: "tag2"},
+    {key: "tag3", label: "tag3"}, 
+  ]);
+  
+  // used for people with whom the docuemnt is being shared
+  const [chipDataCodes, setChipDataCodes] = useState([
+    {key: "12321321", label: "12321321"}, 
+    {key: "1231231231", label: "12312331"},
+    {key: "1232232", label: "1232232"}, 
+  ]);
+
+  const getFileUrl = () => {
+    return locationUrl;
+  };
+  
+  const getFileName = () => {
+    return locationUrl.slice(66, locationUrl.length);
+  };
+
+  const getViewType = () => {
+    const lastFourLetters = locationUrl.slice(locationUrl.length - 4, locationUrl.length);
+    const lastThreeLetter = lastFourLetters.slice(1, 4);
+    console.log(lastFourLetters, lastThreeLetter);
+    return (lastFourLetters === "jpeg" || lastThreeLetter === "png" || lastThreeLetter === "gif"
+      || lastThreeLetter === "jpg" || lastThreeLetter === "tif" || lastThreeLetter === "bmp");
+  };
+
+  const fetcher = { url: getFileUrl() };
+
+  const handleClickOpen = (title, description, tags, sharedWith, locationUrl, extension) => {
+    console.log(title, description, tags, sharedWith, locationUrl);
+    setTitle(title);
+    setDescription(description);
+    setTags(tags.map(e => { return {label: e, key: e} }));
+    setSharedWith(sharedWith.map(e => {return {label: e, key: e} }));
+    setLocationUrl(locationUrl);
+    setExtension(extension);
+
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const onChangeDocument = (e) => {
     setSearchedDocument(e);
@@ -177,8 +329,9 @@ export default function Album() {
   let getSignedUrlFunction = (event, fileLocationUrl, extension) => {
     console.log(fileLocationUrl.slice(66, fileLocationUrl.length));
     var exactFileName = fileLocationUrl.slice(66, fileLocationUrl.length);
-    if (getCategory(extension)) {
-      history.push("/admin/" + "viewer/" + exactFileName);
+    if (getCategory3(extension)) {
+      // history.push("/admin/" + "viewer/" + exactFileName);
+      window.open("https://docs.google.com/viewerng/viewer?url=" + fileLocationUrl, '_blank');
     } else {
       window.open(fileLocationUrl, '_blank');
     }
@@ -186,8 +339,23 @@ export default function Album() {
     // window.open(fileLocationUrl, '_blank');
   };
 
-  let getCategory = (extension) => {
-    return (extension === "application/pdf"); 
+  let getCategory3 = (extension) => {
+    const actualExtension = mimeTypeMap[extension];
+    return googleDocsViewerSupportedFormats.filter((e) => e === actualExtension).length > 0;
+  };
+
+  let getCategory2 = (extension) => {
+    const actualExtension = mimeTypeMap[extension];
+    return (actualExtension === "pdf" || actualExtension === "docx" 
+      || actualExtension === "png" || actualExtension === "jpg" 
+      || actualExtension === "jpeg" || actualExtension === "gif" || actualExtension === "doc");
+  };
+
+  let isImage = (extension) => {
+    const actualExtension = mimeTypeMap[extension];
+    return (actualExtension === "tif" || actualExtension === "tiff" 
+      || actualExtension === "png" || actualExtension === "jpg" 
+      || actualExtension === "jpeg" || actualExtension === "gif" || actualExtension === "jpeg");
   };
 
   let downloadImage = () => {
@@ -226,7 +394,7 @@ export default function Album() {
     console.log(extension);
     console.log("----------------");
     const actualExtension = mimeTypeMap[extension];
-    const stringEnd = (mimeTypeMap[extension] === 'app') ? '003-app.png' :
+    const stringEnd = (actualExtension === 'app') ? '003-app.png' :
       (actualExtension === 'css') ? '008-css.png' :
       (actualExtension === 'csv') ? '009-csv.png' :
       (actualExtension === 'xls') ? '047-xls.png' :
@@ -260,7 +428,7 @@ export default function Album() {
       (actualExtension === 'wav') ? "046-wav format.png" :
       (actualExtension === 'xls') ? "047-xls.png" :
       (actualExtension === 'xml') ? "049-xml.png" :
-        '013-docx.png';
+        "010-dat format.png";
 
     return require('assets/img/fileExtentions/png/' + stringEnd);
   };
@@ -313,6 +481,7 @@ export default function Album() {
         </div>
           ) : (
             <div>
+              <div>
             <div className={classes.heroContent}>
             <Container maxWidth="sm">
               <Typography style={{marginTop: "-60px", marginBottom: "-5px"}} component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
@@ -369,11 +538,18 @@ export default function Album() {
             documents.map((card) => (
               <Grid item key={card} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
+                
                   <CardMedia
                     className={classes.cardMedia}
                     title="Image title"
                     image={getFileExtensionImage(card.extension)}
+                    onClick={isImage(card.extension)
+                      ? (event) => handleClickOpen(card.heading, card.description, card.tags, 
+                        card.sharedWith, card.locationUrl, card.extension)
+                      : (event) => getSignedUrlFunction(event, card.locationUrl, card.extension)
+                    }
                   />
+                  
                   <CardContent className={classes.cardContent}>
                     <Typography gutterBottom variant="h5" component="h2">
                       {`${card.heading}`}
@@ -384,9 +560,14 @@ export default function Album() {
                   </CardContent>
                   <CardActions>
                     <Button size="small" color="primary" 
-                      onClick={(event) => getSignedUrlFunction(event, card.locationUrl, card.extension)}>
+                      // onClick={(event) => getSignedUrlFunction(event, card.locationUrl, card.extension)}>
+                      onClick={isImage(card.extension)
+                        ? (event) => handleClickOpen(card.heading, card.description, card.tags, 
+                          card.sharedWith, card.locationUrl, card.extension)
+                        : (event) => getSignedUrlFunction(event, card.locationUrl, card.extension)}
+                    >
                       {
-                        getCategory(card.extension)
+                        getCategory2(card.extension)
                           ?
                           "View" 
                           : 
@@ -404,6 +585,191 @@ export default function Album() {
           </Grid>
         </Container>
         </div>
+
+
+        <div style={{
+          display: "flex",
+          flexWrap: "wrap", /* Optional. only if you want the items to wrap */
+          justifyContent: "center", /* For horizontal alignment */
+          alignItems: "center", /* For vertical alignment */}}>
+                
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            fullWidth={fullWidth}
+            maxWidth={maxWidth}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{getFileName()}</DialogTitle>
+            <DialogContent>
+
+          <GridContainer>
+          <GridItem xs={12} sm={12} md={8}>
+          <Card>
+          <CardHeader color="primary">
+          <h4 className={classes.cardTitleWhite}>Image Viewer</h4>
+          <p className={classes.cardCategoryWhite}>Click on image for Full Screen</p>
+          </CardHeader>
+          <CardBody>
+          <div style={{
+            display: "flex",
+            flexWrap: "wrap", /* Optional. only if you want the items to wrap */
+            justifyContent: "center", /* For horizontal alignment */
+            alignItems: "center", /* For vertical alignment */}}
+            onClick={(e) => history.push("/admin/" + "viewer/" + (locationUrl.slice(66, locationUrl.length)))}
+          >
+          <ReactFetchImage
+            className='mx-auto'
+            loader={<div>Loading ...</div>}
+            style={{
+                // background: `url(${backgroundSrc})`,
+                width: '60%',
+                height: '60%',
+                marginTop: "20px",
+                // backgroundSize: 'contain',
+                // backgroundPosition: 'center center',
+                // backgroundRepeat: 'no-repeat'
+              }}
+            fetcher={fetcher}
+            />
+            </div>
+          </CardBody>
+          </Card>
+          </GridItem>
+
+
+          <GridItem xs={12} sm={12} md={4}>
+          <Card>
+          <CardHeader color="primary">
+          <h4 className={classes.cardTitleWhite}>Document Info</h4>
+          <p className={classes.cardCategoryWhite}>Your Image Metadata</p>
+          </CardHeader>
+          <CardBody>
+          <GridContainer>
+            <GridItem xs={12} sm={12} md={12}>
+              {
+                <div>
+                  {<TextField
+                    variant="outlined"
+                    margin="normal"
+                    // required
+                    fullWidth
+                    id="publicCode"
+                    label="Title"
+                    // name="publicCode"
+                    autoComplete="publicCode"
+                    // autoFocus
+                    // onChange={e => setMail(e.target.value)}
+                    type="text"
+                    // className="form-control"
+                    name="publicCode"
+                    // value={publicCode || ''}
+                    value={title}
+                    // onChange={"onChangepublicCode"}
+                    multiline
+                    // validations={[required]}
+                  />
+                  }
+                  </div>
+                }
+                </GridItem>
+                <GridItem xs={12} sm={12} md={12}>
+              {
+                <div>
+                  {<TextField
+                    variant="outlined"
+                    margin="normal"
+                    // required
+                    fullWidth
+                    id="publicCode"
+                    label="Description"
+                    // name="publicCode"
+                    autoComplete="publicCode"
+                    // autoFocus
+                    // onChange={e => setMail(e.target.value)}
+                    type="text"
+                    // className="form-control"
+                    name="publicCode"
+                    // value={publicCode || ''}
+                    value={description}
+                    // onChange={"onChangepublicCode"}
+                    multiline
+                    // validations={[required]}
+                  />
+                  }
+                  </div>
+                }
+                </GridItem>
+                <GridItem xs={12} sm={12} md={12}>
+              {
+                <div>
+                <div style={{marginTop: "5px", fontSize: "15px"}}>
+                  Document tags:
+                </div>
+                <div component="ul" className={classes1.root}>
+                  {
+                    tags.map((data) => {
+                    let icon;
+
+
+                    return (
+                    <li key={data.key}>
+                      <Chip
+                      icon={icon}
+                      label={'#' + data.label}
+                      className={classes1.chip}
+                      />
+                    </li>
+                    );
+                  })
+                }
+                </div>
+                </div>
+                }
+                </GridItem>
+                <GridItem xs={12} sm={12} md={12}>
+              {
+                <div>
+                <div style={{marginTop: "5px", fontSize: "15px"}}>
+                  Shared with:
+                </div>
+                <div component="ul" className={classes1.root}>
+                  {
+                    sharedWith.map((data) => {
+                    let icon;
+
+                    return (
+                    <li key={data.key}>
+                      <Chip
+                      icon={icon}
+                      label={'#' + data.label}
+                      className={classes1.chip}
+                      />
+                    </li>
+                    );
+                  })
+                }
+                </div>
+                </div>
+                }
+                </GridItem>
+              </GridContainer>
+            </CardBody>
+          </Card>
+          </GridItem>
+
+          </GridContainer>
+              
+
+            </DialogContent>
+            <DialogActions>
+            </DialogActions>
+          </Dialog>
+          </div>
+
+
+          </div>
           )
         }
 
