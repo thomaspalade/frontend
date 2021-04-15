@@ -106,7 +106,7 @@ export default function Dashboard(props) {
   };
 
   const handleSendMessage = (e) => {
-    axios.post("http://localhost:5000/messages/", {
+    axios.post("http://localhost:9998/messages/", {
       text: "mihaita"
     }).then(res => {
       showNotification("succesAlert");
@@ -139,7 +139,7 @@ export default function Dashboard(props) {
   const getAllUserExistingFeedbacks = () => {
     UserService.getCurrentUser1().then(
       (response) => {
-        axios.get("http://localhost:5000/profile/" + response.data.id).then(res => {
+        axios.get("http://localhost:9998/profile/" + response.data.id).then(res => {
           console.log(JSON.stringify(res.data));
           // setFeedbacks(res.data);
           setPendingDocuments(res.data.pendingDocumentsIds);
@@ -152,7 +152,7 @@ export default function Dashboard(props) {
             // add here support for pending and rejected documents tooo !!!
 
             console.log("here tomi")
-            axios.post("http://localhost:5000/documents/getDocumentsByIds", {
+            axios.post("http://localhost:9998/documents/getDocumentsByIds", {
             requestedDocumentsIds: res.data.requestedDocumentsIds,
             rejectedDocumentsIds: res.data.rejectedDocumentsIds,
             pendingDocumentsIds: res.data.pendingDocumentsIds,
@@ -219,7 +219,7 @@ export default function Dashboard(props) {
     UserService.getCurrentUser1().then(
       (response) => {
         console.log(response);
-        axios.get("http://localhost:5000/profiles").then(res => {
+        axios.get("http://localhost:9998/profiles").then(res => {
               console.log(JSON.stringify(res.data));
               // s-a intors un raspuns bun
             })}).catch((error) => {

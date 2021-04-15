@@ -68,7 +68,7 @@ const snackbarContentStyle = {
     ...dangerBoxShadow
   },
   primary: {
-    backgroundColor: primaryColor[3],
+    backgroundColor: primaryColor[0],
     color: whiteColor,
     ...primaryBoxShadow
   },
@@ -113,7 +113,7 @@ const snackbarContentStyle = {
     color: dangerColor[3]
   },
   primaryIcon: {
-    color: primaryColor[3]
+    color: primaryColor[0]
   },
   roseIcon: {
     color: roseColor[3]

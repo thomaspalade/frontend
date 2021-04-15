@@ -129,7 +129,7 @@ export default function TypographyPage() {
   };
 
   const handleSendMessage = (e) => {
-    axios.post("http://localhost:5000/messages/", {
+    axios.post("http://localhost:9998/messages/", {
       text: text
     }).then(res => {
       showNotification("succesAlert");
@@ -175,7 +175,7 @@ export default function TypographyPage() {
       <InstagramIcon style={{marginTop: -20, marginRight: 14, fontSize: 40}}/>
       <FeedbackIcon style={{marginTop: -20, marginRight: 14, fontSize: 40}}/>
       </div>
-</div>
+    </div>
 
     <div>
       
@@ -285,7 +285,7 @@ export default function TypographyPage() {
                 <FacebookIcon style={{fontSize: 35}}/>
               </Grid>
               <Grid item xs={8}>
-                <div >
+                <div style={{color: "#ff9800"}}>
                   <a href={'https://www.facebook.com/palade.thomas'}>
                   <p style={{textAlign: 'left', fontSize: 17}}>Join or Facebook community: https://www.facebook.com/palade.thomas</p> </a>
                 </div>

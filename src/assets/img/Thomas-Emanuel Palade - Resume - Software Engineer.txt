@@ -1,0 +1,67 @@
+Thomas-Emanuel Palade
+Software Engineer
+
+0760987393
+
+
+PERSONAL INFORMATION
+  Address: , , 
+  Nationality: 
+  Driving License: 
+  Hobbies: Physics, Math, Chess, Music, Podcasts, Comedy, Music Production
+
+LANGUAGES
+  ★★★★☆ English
+  ★★★☆☆ French
+  ★★★★★ Romanian
+
+SKILLS
+  ★★★★☆ 
+  ★★★★☆ Adaptability
+  ★★★★★ Computer Skills
+  ★★★★★ Ability to Work in a Team
+  ★★★★★ Communication
+  ★★★★☆ Creative Thinking
+  ★★★★☆ Java
+  ★★★★☆ C++
+  ★★★★☆ Algorithms
+  ★★★★★ Data Structures
+  ★★★★☆ OOP
+  ★★★★☆ Frontend Development
+  ★★★★★ Backend Development
+  ★★★★★ JavaScript
+  ★★★★☆ Typescript
+  ★★★★★ 
+  ★★★★★ 
+
+WORK EXPERIENCE
+  * August 2020 – Present
+    Software Engineer at IRON sheep TECH, Bucharest
+      - Building and maintaining games for a great online casino, working in an international team with engineers from Colorado, USA, and Perth, Australia.
+- Developed actively on the server-side games that helped to increase the business revenues by 50% during this last year.
+- Technology stack: JavaScript, NodeJs, TypeScript, Tomcat, MongoDB.
+
+  * June 2020 – August 2020
+    C++ Working Student at 1&1 Internet Development SRL, Bucharest
+      - Worked as an intern for an Internet/Cloud german company in an amazing multicultural team that was integrating LibreOffice (opensource, C++ written, integrated office suite) into their own mail platforms and products. 
+- Used and learnt: C, C++, Javascript and Docker.
+
+  * June 2019 – September 2021
+    Junior Full-Stack Software Developer at GTS Global Intelligence, Bucharest
+      - Main task: building and maintaining the site of the new platform "CAVI Connected Buildings". The platform aggregates data from different physical systems (BMS, security, people counting, video analytics) allowing a proper management of large buildings, e.g. malls/office buildings. (React library, Node.js environment, JavaScript, Mongo, Meteor)
+
+  * April 2016 – August 2020
+    Private tutor / Competitive Programmer Mentor at , 
+      Teaching algorithms, programming languages (C/C++/Python), Mathematics and Physics
+
+
+EDUCATION
+  * September 2017 – June 2021
+    The Faculty of Automatic Control and Computer Science, Polytechnic University of Bucharest,  
+
+    Enrolled in a four-year programme, currently in my final year.
+  * September 2013 – June 2017
+    Colegiul National “Cuza Voda” Husi,  
+
+    High School, had a great GPA and many awards in the National Olympiads of Physics, Math, and Computer Science.
+

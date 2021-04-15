@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: '#9c27b0',
+    backgroundColor: '#ff9800',
   },
   form: {
     width: '100%', // Fix IE 11 issue.
@@ -74,10 +74,9 @@ const Login = (props) => {
   const [message, setMessage] = useState("");
   const [succesAlert, setSuccesAlert] = useState(false);
   const [errorAlert, setErrorAlert] = useState(false);
-
+  let history = useHistory();
   const classes = useStyles();
   const [mail, setMail] = useState('');
-  let history = useHistory();
 
   const onChangeUsername = (e) => {
     const username = e.target.value;
@@ -88,6 +87,10 @@ const Login = (props) => {
     const password = e.target.value;
     setPassword(password);
   };
+
+  const handleRedirectToRegister = () => {
+    history.push("/admin/" + "register");
+  };  
 
   const showNotification = place => {
     switch (place) {
@@ -217,12 +220,10 @@ const Login = (props) => {
           )}
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2" style={{color: '#002000'}}>
-                  Forgot password?
-                </Link>
+                
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2" style={{color: '#002000'}}>
+                <Link href="/register" variant="body2" style={{color: '#002000'}} onClick={handleRedirectToRegister}>
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

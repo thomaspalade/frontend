@@ -157,13 +157,6 @@ export default function TypographyPage() {
                         we make, but also the community and partnerships we've
                         cultivated with other developers and companies.
                       </h4>
-                      <h2 style={{textAlign: 'left'}}>Our Values</h2>
-                      <h4>
-                        Our core values include transparency (our work is public most
-                        of the time); creating a safe, high-trust team; building
-                        incredible developer experiences; maintaining a healthy
-                        working environment;
-                      </h4>
                       <h2 style={{textAlign: 'left'}}>Our Story</h2>
                       <h4>
                       </h4>

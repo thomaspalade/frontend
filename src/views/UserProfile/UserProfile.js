@@ -17,7 +17,7 @@ import ContentEditable from "react-contenteditable";
 import Avatar from "@material-ui/core/Avatar";
 import AddAlert from "@material-ui/icons/AddAlert";
 import Snackbar from "components/Snackbar/Snackbar.js";
-
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
 
@@ -134,7 +134,7 @@ export default function UserProfile() {
       (response) => {
         // daca s-a intors aici cu response ok atunci s-a autentificat bine si pot face orice actiune
         // adica token-ul e bine bine
-        axios.get("http://localhost:5000/profile/" + response.data.id).then(res => {
+        axios.get("http://localhost:9998/profile/" + response.data.id).then(res => {
           setFirstName(res.data.firstName);
           setLastName(res.data.lastName);
           setEmail(res.data.email);
@@ -248,10 +248,11 @@ export default function UserProfile() {
     <div>
       <div>
       <div style={{textAlign: 'center'}}>
-      <Typography variant="h2" style={{textAlign: 'center', marginBottom: '15px', marginTop: '-15px'}}>
+      <Typography variant="h2" style={{textAlign: 'center', marginBottom: '15px', marginTop: '-50px'}}>
           My account info
       </Typography>
-      </div>
+      <AccountCircleIcon style={{marginTop: -10, fontSize: 50}}/>
+    </div>
       <GridContainer>
         <GridItem xs={12} sm={12} md={8}>
           <Card>
@@ -261,55 +262,9 @@ export default function UserProfile() {
             </CardHeader>
             <CardBody>
               <GridContainer>
-                <GridItem xs={12} sm={12} md={5}>
-                {
-                  // this is the textbox for email adress
-                  <TextField
-                    variant="outlined"
-                    margin="normal"
-                    // required
-                    fullWidth
-                    id="company"
-                    label="Company"
-                    // name="company"
-                    autoComplete="company"
-                    autoFocus
-                    // onChange={e => setMail(e.target.value)}
-                    type="text"
-                    // className="form-control"
-                    name="company"
-                    value={company || ''}
-                    // value="VIO Dragu SRL"
-                    onChange={onChangeCompany}
-                    // validations={[required]}
-                  />
-                }
-                </GridItem>
-                <GridItem xs={12} sm={12} md={3}>
-                {
-                  // this is the textbox for email adress
-                  <TextField
-                    variant="outlined"
-                    margin="normal"
-                    // required
-                    fullWidth
-                    id="username"
-                    label="Username"
-                    // name="username"
-                    autoComplete="username"
-                    // autoFocus
-                    // onChange={e => setMail(e.target.value)}
-                    type="text"
-                    // className="form-control"
-                    name="username"
-                    value={email.slice(0, 5) || ''}
-                    /// value="Tomi neb 1"
-                    onChange={onChangeUsername}
-                    // validations={[required]}
-                  />
-                }
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
+                
+                
+                <GridItem xs={12} sm={12} md={12}>
                 {
                   // this is the textbox for email adress
                   <TextField
@@ -467,8 +422,6 @@ export default function UserProfile() {
                   tagName="pre"
                   placeholder="This is there place where you can insert text"
                   // html={//this.state.jokeText}
-                  // disabled={//!this.state.editable} // use true to disable edition
-                  //onChange={//this.handleChangeJokeText} // handle innerHTML change
                   // onBlur={this.sanitize}
                 />
                   }
@@ -498,27 +451,6 @@ export default function UserProfile() {
                     // validations={[required]}
                   />
                   
-                  {visible && <TextField
-                    variant="outlined"
-                    margin="normal"
-                    // required
-                    fullWidth
-                    id="publicCode"
-                    label="Public Code"
-                    // name="publicCode"
-                    autoComplete="publicCode"
-                    // autoFocus
-                    // onChange={e => setMail(e.target.value)}
-                    type="text"
-                    // className="form-control"
-                    name="publicCode"
-                    value={publicCode || ''}
-                    // value="Thomas"
-                    onChange={"onChangepublicCode"}
-                    multiline
-                    // validations={[required]}
-                  />
-                  }
                   </div>
                 }
                 </GridItem>
@@ -533,7 +465,7 @@ export default function UserProfile() {
 
         <GridItem xs={12} sm={12} md={4}>
           <Card profile>
-            <Avatar aria-label="recipe" style={{backgroundColor: '#9c27b0',
+            <Avatar aria-label="recipe" style={{backgroundColor: '#ff9800',
               width: "80px", height: "80px", fontSize: "40px", margin: "auto", marginTop: "20px", padding: "20px"}}>
               {`${firstName[0] + lastName[0]}`}
             </Avatar>
@@ -544,9 +476,7 @@ export default function UserProfile() {
               <p className={classes.description}>
               {`${description || ''}`}
               </p>
-              <Button color="primary" round onClick={(e) => setVisible(!visible)}>
-                {!visible ? "Get Public Code" : "Hide Public Code" }
-              </Button>
+              
             </CardBody>
           </Card>
         </GridItem>

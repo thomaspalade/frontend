@@ -113,7 +113,7 @@ export default function FeedbackPage(props) {
   const getAllUserExistingFeedbacks = () => {
     UserService.getCurrentUser1().then(
       (response) => {
-        axios.get("http://localhost:5000/feedbacks/" + response.data.id).then(res => {
+        axios.get("http://localhost:9998/feedbacks/" + response.data.id).then(res => {
           console.log(JSON.stringify(res.data));
           setFeedbacks(res.data);
           // s-a intors un raspuns bun
@@ -149,7 +149,7 @@ export default function FeedbackPage(props) {
         console.log(response);
         console.log(JSON.stringify(response.data.id));
         console.log("Thomas se gandeste bine.");
-        axios.post("http://localhost:5000/feedbacks/", {
+        axios.post("http://localhost:9998/feedbacks/", {
           userId: response.data.id,
           text: text
         }).then(res => {
@@ -157,7 +157,9 @@ export default function FeedbackPage(props) {
           console.log(res);
           console.log(JSON.stringify(res.data));
           setText(res.data.text);
-          window.location.reload(false);
+          setTimeout(function() {
+            window.location.reload(false);
+          }, 1000);
           // s-a intors un raspuns bun
           }).catch((error) => {
             // Error

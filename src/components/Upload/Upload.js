@@ -300,7 +300,7 @@ export default function Album() {
             showNotification("errorAlert", "You didn't upload any file. Upload file and try again, please.");
           } else {
             console.log("not empty files");
-            axios.post("http://localhost:5000/upload/file", data)
+            axios.post("http://localhost:9998/upload/file", data)
             .then(res => {
               // file uploaded succesfully
               console.log(res);
@@ -308,7 +308,7 @@ export default function Album() {
               console.log(JSON.stringify(res.data.extension));
               setPersonName(res.data.extension);
               // extract location from res
-              axios.post("http://localhost:5000/documents", {
+              axios.post("http://localhost:9998/documents", {
                 userId: response.data.id,
                 heading: heading,
                 extension: res.data.extension,

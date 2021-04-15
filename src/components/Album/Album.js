@@ -269,7 +269,7 @@ export default function Album() {
   const getAllUserExistingDocuments = () => {
     UserService.getCurrentUser1().then(
       (response) => {
-        const baseUrl = 'http://localhost:5000';
+        const baseUrl = 'http://localhost:9998';
         const selectedDocuments = (personal === "personal") ? '/documents/' : (personal === "shared") ? 
           '/shareddocuments/' : '/requesteddocuments/';
         const documentId = response.data.id;
