@@ -1,4 +1,4 @@
-# idp-analytics
+# idp-frontend
 
 instalation: npm install
 
